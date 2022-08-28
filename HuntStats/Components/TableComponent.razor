@@ -1,0 +1,50 @@
+﻿@typeparam TItem
+@using System.Diagnostics.CodeAnalysis
+
+<div class="table-wrapper">
+    <div class="table-responsive">
+        <table class="table table-hover data-table table-bordered">
+            <thead>
+            @{
+                if (TableHeader != null)
+                {
+                    <tr>@TableHeader</tr>
+                }
+            }
+            </thead>
+            <tbody>
+            @{
+                foreach (var item in Items)
+                {
+                    if (item != null)
+                    {
+                        <tr class="align-middle">
+                            @if (RowTemplate != null)
+                            {
+                                @RowTemplate(item)
+                            }
+                        </tr>
+                    }
+                }
+            }
+
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public RenderFragment? TableHeader { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem>? RowTemplate { get; set; }
+
+    [Parameter, AllowNull]
+    public IReadOnlyList<TItem> Items { get; set; }
+
+
+}

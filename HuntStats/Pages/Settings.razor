@@ -1,0 +1,69 @@
+﻿@page "/settings"
+@using MediatR
+@using HuntStats.Features
+@using HuntStats.Models
+@inject IMediator _mediator
+@inject IFolderPicker _folderPicker
+
+<div class="card-container" style="max-width: 1280px;margin:  auto;">
+    <div class="card">
+        <div class="card-body">
+            <h3>Settings</h3>
+            
+            <form>
+              <div class="form-group row">
+                <label for="staticEmail" class="col-sm-4 col-form-label">Hunt: Showdown Installation Folder</label>
+                <div class="col-sm-8">
+                    <div @onclick="SelectFolder" class="btn btn-primary d-block">Select installation folder...</div>
+                    @if (FileNotFound)
+                    {
+                        <small class="form-text">File could not be found, are you sure you selected the right folder?</small>
+                    }
+                    else
+                    {
+                        @if (HuntSettings.Path == null || HuntSettings.Path == string.Empty)
+                        {
+                            <small class="form-text">No folder selected yet...</small>
+                        }
+                        else
+                        {
+                            <small class="form-text">Current: @HuntSettings.Path</small>
+                        }
+                    }
+                </div>
+              </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    public bool FileNotFound { get; set; } = false;
+    
+    public Models.Settings HuntSettings { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        HuntSettings = await _mediator.Send(new GetSettingsCommand());
+    }
+
+    public async Task SelectFolder()
+    {
+        var result = await _folderPicker.PickFolder();
+        if (result != null)
+        {
+            HuntSettings.Path = result;
+            var updateResult = await _mediator.Send(new UpdateSettingsCommand(result));
+            if (updateResult == GeneralStatus.Error)
+            {
+                FileNotFound = true;
+            }
+            else
+            {
+                FileNotFound = false;
+            }
+        }
+    }
+
+}

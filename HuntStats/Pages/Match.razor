@@ -1,0 +1,47 @@
+﻿@page "/match/{Id:int}"
+@using MediatR
+@using HuntStats.Features
+@using HuntStats.Models
+@using ConsoleApp1.Models
+@inject IMediator Mediator
+@inject IFolderPicker FolderPicker
+@inject NavigationManager NavigationManager
+
+<div class="card-container" style="max-width: 1280px;margin: auto;">
+    <div class="d-flex justify-content-between mb-3">
+        <div class="left"></div>
+        <div class="right">
+            <div class="btn btn-primary" @onclick='() => { NavigationManager.NavigateTo("/match"); }'>Back</div>
+        </div>
+    </div>
+    <div class="card">
+        @if (HuntMatch != null)
+        {
+            <div class="card-body">
+                <h3>Match: @HuntMatch.DateTime.ToString("dd-MM-yyyy hh:mm:ss")</h3>
+                @foreach (var team in HuntMatch.Teams)
+                {
+                    
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    public HuntMatch HuntMatch { get; set; }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != null)
+        {
+            HuntMatch = await Mediator.Send(new GetMatchbyIdCommand(Id));
+        }
+    }
+}

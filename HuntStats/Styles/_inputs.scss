@@ -1,0 +1,24 @@
+input.form-control {
+  border-radius: 10px !important;
+  border: 2px solid #ebebeb;
+}
+
+.btn {
+  border-radius: 12px !important;
+}
+
+.btn:focus {
+  box-shadow: unset !important;
+  outline: unset !important;
+  border-color: #343740;
+}
+
+.btn:disabled, .btn.disabled {
+  border-color: #343740 !important;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: unset !important;
+  border: 2px solid #343740;
+}

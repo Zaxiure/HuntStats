@@ -1,0 +1,41 @@
+﻿
+<CascadingValue Value="this">
+    
+    <ul class="nav nav-pills mb-3 " role="group">
+        @foreach (TabPage tabPage in Pages)
+        {
+            <li class="nav-item">
+                <a href="" @onclick:preventDefault class="nav-link @GetButtonClass(tabPage)" @onclick=@(() => ActivatePage(tabPage))>@tabPage.Text</a>
+            </li>
+        }
+    </ul>
+    @ChildContent
+</CascadingValue>
+
+@code
+{
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+
+    public TabPage ActivePage { get; set; }
+    List<TabPage> Pages = new();
+
+    internal void AddPage(TabPage tabPage)
+    {
+        Pages.Add(tabPage);
+        if (Pages.Count == 1)
+            ActivePage = tabPage;
+        StateHasChanged();
+    }
+
+    string GetButtonClass(TabPage page)
+    {
+        return page == ActivePage ? "active" : "";
+    }
+
+    void ActivatePage(TabPage page)
+    {
+        ActivePage = page;
+    }
+}

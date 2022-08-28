@@ -1,0 +1,162 @@
+﻿@using HuntStats.State
+@using System.ComponentModel
+@using System.Diagnostics
+@using Dapper
+@using HuntStats.Data
+@using HuntStats.Features
+@using MediatR
+@using Microsoft.VisualBasic.Devices
+@inherits LayoutComponentBase
+@inject AppState _appState;
+@inject IDbConnectionFactory _connectionFactory;
+@inject IMediator _mediator
+
+<div class="layout" @onmousedown="_appState.ClickedOutside">
+    <div class="sidebar @SidebarClass()">
+        <div class="sidebar-wrapper">
+            <NavMenu/>
+        </div>
+    </div>
+    @* <div class="sidebar-faker"></div> *@
+    <div @onclick="ToggleSidebar" class="sidebar-backdrop">
+    </div>
+    <div @onclick="ToggleSidebar" class="sidebar-toggle" id="sidebarToggle">
+        <i id="sidebarToggleIcon" class="far fa-chevron-left"></i>
+        <i id="sidebarToggleIcon" class="far fa-chevron-right"></i>
+    </div>
+    <div class="main">
+        <div class="header">
+            <a id="sidebarToggle" @onclick="ToggleSidebar" class="nav-link mobile-sidebar-toggle">
+                <i class="far fa-bars"></i>
+            </a>
+            <div class="right-header">
+                @if (Path == null || Path == string.Empty)
+                {
+                    <button disabled class="btn btn-primary disabled">
+                        Please check ur settings...
+                    </button>
+                }
+                else
+                {
+                    @if (worker.CancellationPending)
+                    {
+                        <button disabled class="btn btn-primary disabled">
+                            Stopping background worker...
+                        </button>
+                    }
+                    else
+                    {
+                        @if (!worker.IsBusy)
+                        {
+                            <button @onclick="ToggleCheck" class="btn btn-primary">
+                                Start background worker
+                            </button>
+                        }
+                        else
+                        {
+                            <button @onclick="ToggleCheck" class="btn btn-primary">
+                                Stop background worker
+                            </button>
+                        }
+                    }
+                }
+            </div>
+        </div>
+        <div class="container">
+            <div class="content">
+                @Body
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private BackgroundWorker worker;
+    public string Path { get; set; }
+    private bool _navState;
+    private string _userMail;
+    private Boolean _sidebarClosed = false;
+    private Boolean _mobileSidebarOpen = false;
+
+    public string SidebarClass()
+    {
+        if (_sidebarClosed) return "closed";
+        return "";
+    }
+
+    public void ToggleSidebar()
+    {
+        _sidebarClosed = !_sidebarClosed;
+        StateHasChanged();
+    }
+    
+    public async Task ToggleCheck()
+    {
+        if (!worker.CancellationPending)
+        {
+            if (worker.IsBusy)
+            {
+                Debug.WriteLine("Stopping background worker...");
+                worker.CancelAsync();
+            }
+            else
+            {
+                Debug.WriteLine("Starting background worker...");
+                worker.RunWorkerAsync();
+            }
+        }
+        // StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _appState.CloseSidebarEvent += ToggleSidebar;
+        _appState.PathChangedEvent += AppStateOnPathChangedEvent;
+        Path = (await _mediator.Send(new GetSettingsCommand())).Path;
+        ConstructWorker();
+        var createTables = @"
+        CREATE TABLE IF NOT EXISTS Settings (
+        Id            INTEGER
+        primary key autoincrement,
+        Path             nvarchar(16)
+        );
+        ";
+        var con = await _connectionFactory.GetOpenConnectionAsync();
+        await con.QueryAsync(createTables);
+    }
+
+    private void AppStateOnPathChangedEvent(string obj)
+    {
+        Path = obj;
+        StateHasChanged();
+    }
+
+    private void ConstructWorker()
+    {
+        worker = new BackgroundWorker();
+        worker.RunWorkerCompleted += WorkerOnRunWorkerCompleted;
+        worker.DoWork += WorkerOnDoWork;
+        worker.WorkerSupportsCancellation = true;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void WorkerOnRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+    {
+        if (e.Cancelled)
+        {
+            StateHasChanged();
+        }
+    }
+
+    private void WorkerOnDoWork(object sender, DoWorkEventArgs e)
+    {
+        while (!worker.CancellationPending)
+        {
+            Thread.Sleep(10*1000);
+            var result = Task.Run(() => { _mediator.Send(new XmlFileQuery()); });
+        }
+        Debug.WriteLine("Background worker should have stopped at this moment...");
+        ConstructWorker();
+    }
+}

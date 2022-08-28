@@ -1,0 +1,46 @@
+@keyframes shadowIn {
+  0% {
+    opacity:0;
+  }
+  100% {
+    opacity:.5;
+  }
+}
+
+@keyframes shadowOut {
+  0% {
+    opacity:.5;
+  }
+  99% {
+    opacity:0;
+  }
+  100% {
+    opacity:0;
+    visibility: hidden;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity:0;
+  }
+  100% {
+    opacity:1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity:1;
+  }
+  99% {
+    opacity:0;
+  }
+  100% {
+    opacity:0;
+    visibility: hidden;
+  }
+}
+
+
+

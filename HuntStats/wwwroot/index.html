@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+	<title>HuntStats</title>
+	<base href="/" />
+	<link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+	<link href="css/app.css" rel="stylesheet" />
+	<link href="HuntStats.styles.css" rel="stylesheet" />
+</head>
+
+<body>
+
+	<div class="status-bar-safe-area"></div>
+
+	<div id="app">Loading...</div>
+
+	<div id="blazor-error-ui">
+		An unhandled error has occurred.
+		<a href="" class="reload">Reload</a>
+		<a class="dismiss">🗙</a>
+	</div>
+	<script>
+		window.getWidth = () => {
+			return window.innerWidth
+		}
+
+		window.createDropdown = (clickElement, dropdownElement) => {
+			let dropdown = Popper.createPopper(clickElement, dropdownElement, {
+				placement: "bottom-start",
+				modifiers: [{
+					name: 'preventOverflow',
+					options: {
+						rootBoundary: 'document',
+						altAxis: true,
+						mainAxis: false,
+						tether: false,
+						padding: 15
+					}
+				}],
+				strategy: 'fixed'
+			})
+			setTimeout(() => {
+				dropdown.update();
+			}, 100)
+		}
+	</script>
+
+	<script>
+		window.setScrollLock = (state) => {
+
+			``
+			if (state == false) {
+				document.body.className = ""
+			} else {
+				document.body.className = "scrollLock"
+			}
+			return 1;
+		}
+	</script>
+	<script src="_framework/blazor.webview.js" autostart="false"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,113 @@
+@using Microsoft.JSInterop
+@using HuntStats.State
+@inject AppState _appstate;
+@inject IJSRuntime JS;
+@implements IDisposable
+<div @onmousedown:stopPropagation="true" class="dropdown-container">
+    @{
+        if (DropdownClickable != null)
+        {
+            <div @ref="_clickWrapper" @onmousedown="toggleDropdown" class="click-wrapper">
+                @DropdownClickable(_dropdownOpened.ToString())
+            </div>
+        }
+    }
+    <div @ref="_dropdownElement" class="dropdown shadow @Class @getDropdownClass()">
+        @{
+            if (DropdownContent != null)
+            {
+                @DropdownContent
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? Class { get; set; }
+    
+    [Parameter]
+    public RenderFragment<string>? DropdownClickable { get; set; }
+    
+    [Parameter]
+    public RenderFragment? DropdownContent { get; set; }
+
+    private ElementReference _clickWrapper;
+    private ElementReference _dropdownElement;
+
+    private string? _uniqueId;
+    private Boolean _initialized = false;
+    private Boolean _dropdownOpened = false;
+    private Boolean _stopAnimation = false;
+
+    private string getDropdownClass()
+    {
+        var returnClass = "";
+        if (_dropdownOpened) returnClass += "opened";
+        if (_initialized) returnClass += " loaded";
+        if (_stopAnimation) returnClass += " stopanim";
+        return returnClass;
+    }
+    
+    private void toggleDropdown()
+    {
+        _dropdownOpened = !_dropdownOpened;
+        if(_dropdownOpened) _appstate.OpenedDropdown(_uniqueId);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(500);
+            await JS.InvokeAsync<string>("createDropdown", _clickWrapper, _dropdownElement);
+            
+            _stopAnimation = true;
+            _initialized = true;
+            StateHasChanged();
+            await Task.Delay(100);
+            StateHasChanged();
+            await Task.Delay(1200);
+            _stopAnimation = false;
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _uniqueId = Guid.NewGuid().ToString();
+        _appstate.CloseOpenedDropdownEvent += AppstateOnCloseOpenedDropdownEvent;;
+        _appstate.OpenedDropdownEvent += AppstateDropdownOpened;
+        _appstate.ClickOutside += AppstateOnClickOutside;
+    }
+
+    public void Dispose()
+    {
+        _appstate.CloseOpenedDropdownEvent -= AppstateOnCloseOpenedDropdownEvent;
+        _appstate.OpenedDropdownEvent -= AppstateDropdownOpened;
+        _appstate.ClickOutside -= AppstateOnClickOutside;
+    }
+
+    private void AppstateOnCloseOpenedDropdownEvent()
+    {
+        if (_uniqueId == _appstate.OpenedUniqueId)
+        {
+            _dropdownOpened = false;
+        }
+    }
+
+    private void AppstateDropdownOpened()
+    {
+        if (_appstate.LastOpenedUniqueId == _uniqueId && _appstate.OpenedUniqueId != _uniqueId)
+        {
+            _dropdownOpened = false;
+        }
+        StateHasChanged();
+    }
+
+    private void AppstateOnClickOutside(MouseEventArgs mouseEventArgs)
+    {
+        _dropdownOpened = false;
+        StateHasChanged();
+    }
+}
