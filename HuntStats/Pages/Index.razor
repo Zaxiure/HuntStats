@@ -1,4 +1,4 @@
-﻿@page "/match"
+﻿@page "/"
 @using System.Diagnostics
 @using System.ComponentModel
 @using ConsoleApp1.Models
@@ -18,40 +18,9 @@
 <div class="card-container" style="max-width: 1280px;margin:  auto;">
     <div class="card">
         <div class="card-body">
-            <h3>Matches</h3>
+            <h3>Info</h3>
             
-            <div class="table-wrapper">
-                <table class="table table-dark data-table" style="margin-bottom: 0 !important;">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Date</th>
-                            <th scope="col">Teams</th>
-                            <th scope="col">Total Players</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var match in Matches)
-                    {
-                        <tr>
-                            <th scope="row">@match.Id</th>
-                            <td>@match.DateTime</td>
-                            <td>@match.Teams.Count</td>
-                            <td>@match.Teams.Select(x => x.Players.Count).Sum()</td>
-                            <td>
-                                <div @onclick='() => { NavigationManager.NavigateTo("/match/" + match.Id); }' class="btn btn-primary">
-                                    <i class="fal fa-eye"></i>
-                                </div>
-                                <div class="btn btn-primary">
-                                    <i class="fal fa-trash"></i>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            </div>
+            Hello, if you like what you see in my application please consider giving it a star on github (:
         </div>
     </div>
 </div>

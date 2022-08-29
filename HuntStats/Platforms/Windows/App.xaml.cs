@@ -23,16 +23,5 @@ public partial class App : MauiWinUIApplication
 	}
 
 	protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
-	
-	protected override void OnLaunched(LaunchActivatedEventArgs args)
-	{
-		base.OnLaunched(args);
-		var currentWindow = Application.Windows[0].Handler.PlatformView;
-		IntPtr _windowHandle = WindowNative.GetWindowHandle(currentWindow);
-		var windowId = Win32Interop.GetWindowIdFromWindow(_windowHandle);
-
-		AppWindow appWindow = AppWindow.GetFromWindowId(windowId);
-		appWindow.Title = "HuntStats";
-	}
 }
 

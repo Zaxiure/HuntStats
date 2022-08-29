@@ -18,10 +18,18 @@
         @if (HuntMatch != null)
         {
             <div class="card-body">
-                <h3>Match: @HuntMatch.DateTime.ToString("dd-MM-yyyy hh:mm:ss")</h3>
+                <h3>Match: @HuntMatch.DateTime.ToString("dd-MM-yyyy HH:mm:ss")</h3>
                 @foreach (var team in HuntMatch.Teams)
                 {
-                    
+                    <div class="team">
+                        <div class="team-title">Team #@(HuntMatch.Teams.IndexOf(team)+1)</div>
+                        @foreach (var player in team.Players)
+                        {
+                            <div class="team-player">
+                                @player.Name
+                            </div>
+                        }
+                    </div>
                 }
             </div>
         }

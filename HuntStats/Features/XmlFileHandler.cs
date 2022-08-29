@@ -48,47 +48,49 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
     public bool CheckSameMatch(string filePath1, string filePath2)
     {
         XmlSerializer reader = new XmlSerializer(typeof(Attributes));  
-        StreamReader file = new System.IO.StreamReader(filePath1);  
-        XmlSerializer reader2 = new XmlSerializer(typeof(Attributes));  
-        StreamReader file2 = new System.IO.StreamReader(filePath2);  
-            
-    
-        Attributes overview =  (Attributes)reader.Deserialize(file);
-        Attributes overview2 =  (Attributes)reader.Deserialize(file2);
-        
-        var attributes = new Dictionary<string, string>();
-    
-        foreach (var attr in overview.Atrributes)
+        XmlSerializer reader2 = new XmlSerializer(typeof(Attributes));
+        using (StreamReader file = new System.IO.StreamReader(filePath1))
         {
-            attributes.Add(attr.Name, attr.Value);
-        }
-        
-        var attributes2 = new Dictionary<string, string>();
-    
-        foreach (var attr in overview2.Atrributes)
-        {
-            attributes2.Add(attr.Name, attr.Value);
-        }
-
-        var total = 0;
-        var succes = 0;
-
-        foreach (var overviewAtrribute in attributes)
-        {
-            total += total;
-            if (attributes2[overviewAtrribute.Key] == overviewAtrribute.Value)
+            using (StreamReader file2 = new System.IO.StreamReader(filePath2))
             {
-                succes += succes;
+                Attributes overview =  (Attributes)reader.Deserialize(file);
+                Attributes overview2 =  (Attributes)reader2.Deserialize(file2);
+                
+                var attributes = new Dictionary<string, string>();
+            
+                foreach (var attr in overview.Atrributes)
+                {
+                    attributes.Add(attr.Name, attr.Value);
+                }
+                
+                var attributes2 = new Dictionary<string, string>();
+            
+                foreach (var attr in overview2.Atrributes)
+                {
+                    attributes2.Add(attr.Name, attr.Value);
+                }
+        
+                var total = 0;
+                var succes = 0;
+        
+                foreach (var overviewAtrribute in attributes.Where(x => x.Key.Contains("Mission")))
+                {
+                    total += 1;
+                    if (attributes2[overviewAtrribute.Key] == overviewAtrribute.Value)
+                    {
+                        succes += 1;
+                    }
+                }
+        
+                var percentage = (succes / total) * 100;
+                if (percentage > 80)
+                {
+                    return true;
+                }
+        
+                return false;
             }
         }
-
-        var percentage = (succes / total) * 100;
-        if (percentage > 80)
-        {
-            return true;
-        }
-
-        return false;
     }
     
     // This needs to be cleaned up because holy shit....
@@ -113,15 +115,27 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
         }
         else
         {
-            sameFile = CheckSameMatch(huntFilePath, huntFileTempPath);
+            if (File.Exists(huntFileTempPath + ".tmp"))
+            {
+                await Task.Delay(500);
+                File.Delete(huntFileTempPath + ".tmp");
+            }
+            File.Copy(huntFilePath, huntFileTempPath + ".tmp");
+            sameFile = CheckSameMatch(huntFileTempPath + ".tmp", huntFileTempPath);
+            await Task.Delay(500);
+            if (sameFile)
+            {
+                File.Delete(huntFileTempPath + ".tmp");
+            }
         }
         
         if(!sameFile)
         {
             File.Delete(huntFileTempPath);
-            File.Copy(huntFilePath, huntFileTempPath);
+            File.Copy(huntFileTempPath + ".tmp", huntFileTempPath);
+            File.Delete(huntFileTempPath + ".tmp");
             XmlSerializer reader = new XmlSerializer(typeof(Attributes));  
-            StreamReader file = new System.IO.StreamReader( huntFilePath);  
+            StreamReader file = new System.IO.StreamReader(huntFileTempPath);  
             
     
             Attributes overview =  (Attributes)reader.Deserialize(file);

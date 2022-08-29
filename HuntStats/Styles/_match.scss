@@ -1,0 +1,16 @@
+.team {
+  border: 1px solid #343740;
+  border-radius: 10px;
+  //padding: 15px;
+  margin: 15px;
+  
+  .team-title {
+    padding: 5px 15px;
+    //border-bottom: 1px solid #343740;
+  }
+  
+  .team-player {
+    padding: 5px 15px;
+    border-top: 1px solid #343740;
+  }
+}

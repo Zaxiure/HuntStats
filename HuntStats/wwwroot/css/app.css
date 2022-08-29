@@ -824,6 +824,19 @@ input.form-control {
   background-color: #ebebeb;
 }
 
+.team {
+  border: 1px solid #343740;
+  border-radius: 10px;
+  margin: 15px;
+}
+.team .team-title {
+  padding: 5px 15px;
+}
+.team .team-player {
+  padding: 5px 15px;
+  border-top: 1px solid #343740;
+}
+
 #blazor-error-ui {
   display: none;
 }
