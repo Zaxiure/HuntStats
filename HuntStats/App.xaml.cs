@@ -1,4 +1,6 @@
-﻿namespace HuntStats;
+﻿using HuntStats.State;
+
+namespace HuntStats;
 
 public partial class App : Application
 {
@@ -7,5 +9,16 @@ public partial class App : Application
 		InitializeComponent();
 
 		MainPage = new MainPage();
+	}
+
+	protected override Window CreateWindow(IActivationState activationState)
+	{
+		var window = base.CreateWindow(activationState);
+		if (window != null)
+		{
+			window.Title = "HüntStäts";
+		}
+
+		return window;
 	}
 }

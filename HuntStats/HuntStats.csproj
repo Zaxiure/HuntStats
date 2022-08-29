@@ -67,7 +67,6 @@
 
     <ItemGroup>
       <Folder Include="State" />
-      <Folder Include="Styles" />
     </ItemGroup>
 
 </Project>
