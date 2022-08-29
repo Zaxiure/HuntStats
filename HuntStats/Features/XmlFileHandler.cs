@@ -44,6 +44,52 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
         _connectionFactory = connectionFactory;
         _appState = appState;
     }
+
+    public bool CheckSameMatch(string filePath1, string filePath2)
+    {
+        XmlSerializer reader = new XmlSerializer(typeof(Attributes));  
+        StreamReader file = new System.IO.StreamReader(filePath1);  
+        XmlSerializer reader2 = new XmlSerializer(typeof(Attributes));  
+        StreamReader file2 = new System.IO.StreamReader(filePath2);  
+            
+    
+        Attributes overview =  (Attributes)reader.Deserialize(file);
+        Attributes overview2 =  (Attributes)reader.Deserialize(file2);
+        
+        var attributes = new Dictionary<string, string>();
+    
+        foreach (var attr in overview.Atrributes)
+        {
+            attributes.Add(attr.Name, attr.Value);
+        }
+        
+        var attributes2 = new Dictionary<string, string>();
+    
+        foreach (var attr in overview2.Atrributes)
+        {
+            attributes2.Add(attr.Name, attr.Value);
+        }
+
+        var total = 0;
+        var succes = 0;
+
+        foreach (var overviewAtrribute in attributes2)
+        {
+            total += total;
+            if (attributes2[overviewAtrribute.Key] == overviewAtrribute.Value)
+            {
+                succes += succes;
+            }
+        }
+
+        var percentage = (succes / total) * 100;
+        if (percentage > 80)
+        {
+            return true;
+        }
+
+        return false;
+    }
     
     // This needs to be cleaned up because holy shit....
     public async Task<GeneralStatus> Handle(XmlFileQuery request, CancellationToken cancellationToken)
@@ -67,7 +113,7 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
         }
         else
         {
-            sameFile = (await File.ReadAllBytesAsync(huntFilePath)).SequenceEqual(await File.ReadAllBytesAsync(huntFileTempPath));
+            sameFile = CheckSameMatch(huntFilePath, huntFileTempPath);
         }
         
         if(!sameFile)
