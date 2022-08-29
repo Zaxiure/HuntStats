@@ -73,7 +73,7 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
         var total = 0;
         var succes = 0;
 
-        foreach (var overviewAtrribute in attributes2)
+        foreach (var overviewAtrribute in attributes)
         {
             total += total;
             if (attributes2[overviewAtrribute.Key] == overviewAtrribute.Value)
