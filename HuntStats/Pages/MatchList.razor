@@ -36,7 +36,7 @@
                     {
                         <tr>
                             <th scope="row">@match.Id</th>
-                            <td>@match.DateTime</td>
+                            <td>@match.DateTime.ToLocalTime()</td>
                             <td>@match.Teams.Count</td>
                             <td>@match.Teams.Select(x => x.Players.Count).Sum()</td>
                             <td>
