@@ -132,7 +132,7 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
         if(!sameFile)
         {
             File.Delete(huntFileTempPath);
-            File.Copy(huntFileTempPath + ".tmp", huntFileTempPath);
+            File.Copy(huntFilePath, huntFileTempPath);
             File.Delete(huntFileTempPath + ".tmp");
             XmlSerializer reader = new XmlSerializer(typeof(Attributes));  
             StreamReader file = new System.IO.StreamReader(huntFileTempPath);  
