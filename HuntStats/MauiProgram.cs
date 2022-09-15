@@ -42,6 +42,8 @@ public static class MauiProgram
 		builder.Services.AddBlazorWebViewDeveloperTools();
 		#endif
 		
+		
+		
 		return builder.Build();
 	}
 }

@@ -1,4 +1,5 @@
-﻿using Dommel;
+﻿using Dapper;
+using Dommel;
 using HuntStats.Data;
 using HuntStats.Models;
 using HuntStats.State;
@@ -28,15 +29,106 @@ public class GetSettingsCommandHandler : IRequestHandler<GetSettingsCommand, Set
         var settings = await con.FirstOrDefaultAsync<Settings>(x => x.Id == 1);
         if (settings == null)
         {
-            await con.InsertAsync(new Settings()
+            settings = new Settings()
             {
                 Path = ""
-            });
+            };
+            await con.InsertAsync(settings);
         }
         
         _appState.PathChanged(settings.Path);
 
         return settings;
+    }
+}
+
+public class InitializeDatabaseCommand : IRequest<GeneralStatus>
+{
+    
+}
+
+public class InitializeDatabaseCommandHandler : IRequestHandler<InitializeDatabaseCommand, GeneralStatus>
+{
+    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly AppState _appState;
+    
+    public InitializeDatabaseCommandHandler(IDbConnectionFactory connectionFactory, AppState appState)
+    {
+        _connectionFactory = connectionFactory;
+        _appState = appState;
+    }
+    
+    public async Task<GeneralStatus> Handle(InitializeDatabaseCommand request, CancellationToken cancellationToken)
+    {
+        using var con = await _connectionFactory.GetOpenConnectionAsync();
+        con.QueryAsync(@"create table if not exists Accolades
+(
+    Id            INTEGER not null
+        primary key autoincrement
+        unique,
+    BloodlineXp   INTEGER,
+    Bounty        INTEGER,
+    Category      nvarchar,
+    Header        nvarchar,
+    EventPoints   INTEGER,
+    Gems          INTEGER,
+    GeneratedGems INTEGER,
+    Gold          INTEGER,
+    Hits          INTEGER,
+    HunterPoints  INTEGER,
+    HunterXp      INTEGER,
+    Weighting     INTEGER,
+    Xp            INTEGER,
+    MatchId       INTEGER
+);
+
+create table if not exists Entries
+(
+    Id              INTEGER not null
+        primary key autoincrement
+        unique,
+    Category        nvarchar,
+    DescriptorName  nvarchar,
+    DescriptorScore INTEGER,
+    DescriptorType  INTEGER,
+    Reward          INTEGER,
+    RewardSize      INTEGER,
+    UiName          nvarchar,
+    UiName2         nvarchar,
+    MatchId         INTEGER,
+    Amount          INTEGER
+);
+
+create table if not exists Match
+(
+    Id        INTEGER not null
+        primary key autoincrement,
+    DateTime  INTEGER,
+    Scrapbeak INTEGER,
+    Assassin  INTEGER,
+    Spider    INTEGER,
+    Butcher   INTEGER
+);
+
+create table if not exists Settings
+(
+    Id   INTEGER
+        primary key autoincrement,
+    Path nvarchar(16)
+);
+
+create table if not exists Teams
+(
+    Id      INTEGER not null
+        primary key autoincrement,
+    Mmr     INTEGER,
+    Players nvarchar,
+    MatchId INTEGER not null
+);
+
+");
+
+        return GeneralStatus.Succes;
     }
 }
 

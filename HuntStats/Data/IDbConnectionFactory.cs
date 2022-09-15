@@ -1,4 +1,7 @@
 ﻿using System.Data.Common;
+using Dapper;
+using Dommel;
+using HuntStats.Models;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 
