@@ -52,11 +52,17 @@ public class Player
 
     public int KilledByMe { get; set; }
     
+    public int DownedByMe { get; set; }
+    
     public int KilledByTeammate { get; set; }
+    public int DownedByTeammate { get; set; }
     
     public int KilledMe { get; set; }
+    
+    public int DownedMe { get; set; }
 
     public int KilledTeammate { get; set; }
+    public int DownedTeammate { get; set; }
     
     public bool Proximity { get; set; }
     public bool ProximityTeammate { get; set; }

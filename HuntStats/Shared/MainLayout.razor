@@ -110,6 +110,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await _mediator.Send(new InitializeDatabaseCommand());
         _appState.CloseSidebarEvent += ToggleSidebar;
         _appState.PathChangedEvent += AppStateOnPathChangedEvent;
         Path = (await _mediator.Send(new GetSettingsCommand())).Path;
