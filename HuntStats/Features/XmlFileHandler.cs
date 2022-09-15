@@ -101,9 +101,11 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
         var appdataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\HuntStats";
         var huntFilePath = settings.Path + @"\user\profiles\default\attributes.xml";
         var huntFileTempPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\HuntStats\attributes.xml";
-
+        
         if(!Directory.Exists(appdataDirectory)) Directory
             .CreateDirectory(appdataDirectory);
+
+        if (!File.Exists(huntFilePath)) return GeneralStatus.Error;
 
         HuntMatchTable foundMatch = null;
 

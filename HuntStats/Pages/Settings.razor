@@ -11,27 +11,44 @@
             <h3>Settings</h3>
             
             <form>
-              <div class="form-group row">
-                <label for="staticEmail" class="col-sm-4 col-form-label">Hunt: Showdown Installation Folder</label>
-                <div class="col-sm-8">
-                    <div @onclick="SelectFolder" class="btn btn-primary d-block">Select installation folder...</div>
-                    @if (FileNotFound)
-                    {
-                        <small class="form-text">File could not be found, are you sure you selected the right folder?</small>
-                    }
-                    else
-                    {
-                        @if (HuntSettings.Path == null || HuntSettings.Path == string.Empty)
+                <div class="form-group row">
+                    <label for="staticEmail" class="col-sm-4 col-form-label">Hunt: Showdown Installation Folder</label>
+                    <div class="col-sm-8">
+                        <div @onclick="SelectFolder" class="btn btn-primary d-block">Select installation folder...</div>
+                        @if (FileNotFound)
                         {
-                            <small class="form-text">No folder selected yet...</small>
+                            <small class="form-text">File could not be found, are you sure you selected the right folder?</small>
                         }
                         else
                         {
-                            <small class="form-text">Current: @HuntSettings.Path</small>
+                            @if (HuntSettings.Path == null || HuntSettings.Path == string.Empty)
+                            {
+                                <small class="form-text">No folder selected yet...</small>
+                            }
+                            else
+                            {
+                                <small class="form-text">Current: @HuntSettings.Path</small>
+                            }
                         }
-                    }
+                    </div>
                 </div>
-              </div>
+                <div class="form-group row">
+                    <label for="staticEmail" class="col-sm-4 col-form-label">Start background worker when opening application</label>
+                    <div class="col-sm-8">
+                        @if (HuntSettings.Path == null || HuntSettings.Path == string.Empty || FileNotFound)
+                        {
+                            <div disabled class="btn btn-primary">
+                                Select a path first (:
+                            </div>
+                        }
+                        else
+                        {
+                            <div @onclick="ToggleStartBackgroundWorkerOnBoot" class="btn btn-primary">
+                                @(HuntSettings.StartWorkerOnBoot ? "On" : "Off")
+                            </div>
+                        }
+                    </div>
+                </div>
             </form>
         </div>
     </div>
@@ -54,7 +71,7 @@
         if (result != null)
         {
             HuntSettings.Path = result;
-            var updateResult = await _mediator.Send(new UpdateSettingsCommand(result));
+            var updateResult = await _mediator.Send(new UpdateSettingsCommand(HuntSettings));
             if (updateResult == GeneralStatus.Error)
             {
                 FileNotFound = true;
@@ -66,4 +83,9 @@
         }
     }
 
+    private async Task ToggleStartBackgroundWorkerOnBoot()
+    {
+        HuntSettings.StartWorkerOnBoot = !HuntSettings.StartWorkerOnBoot;
+        await _mediator.Send(new UpdateSettingsCommand(HuntSettings));
+    }
 }

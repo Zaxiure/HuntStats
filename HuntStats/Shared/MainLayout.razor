@@ -2,8 +2,10 @@
 @using System.ComponentModel
 @using System.Diagnostics
 @using Dapper
+@using Dommel
 @using HuntStats.Data
 @using HuntStats.Features
+@using HuntStats.Models
 @using MediatR
 @inherits LayoutComponentBase
 @inject AppState _appState;
@@ -113,22 +115,26 @@
         await _mediator.Send(new InitializeDatabaseCommand());
         _appState.CloseSidebarEvent += ToggleSidebar;
         _appState.PathChangedEvent += AppStateOnPathChangedEvent;
-        Path = (await _mediator.Send(new GetSettingsCommand())).Path;
+        var settings = (await _mediator.Send(new GetSettingsCommand()));
+        Path = settings.Path;
         ConstructWorker();
-        var createTables = @"
-        CREATE TABLE IF NOT EXISTS Settings (
-        Id            INTEGER
-        primary key autoincrement,
-        Path             nvarchar(16)
-        );
-        ";
         var con = await _connectionFactory.GetOpenConnectionAsync();
-        await con.QueryAsync(createTables);
+        if (settings.StartWorkerOnBoot)
+        {
+            worker.RunWorkerAsync();
+        }
     }
 
     private void AppStateOnPathChangedEvent(string obj)
     {
         Path = obj;
+        if (worker != null)
+        {
+            if (!File.Exists(Path + @"\user\profiles\default\attributes.xml"))
+            {
+                if(!worker.CancellationPending || worker.IsBusy) worker.CancelAsync();
+            }
+        }
         StateHasChanged();
     }
 
@@ -155,6 +161,7 @@
         {
             Thread.Sleep(10*1000);
             var result = Task.Run(() => { _mediator.Send(new XmlFileQuery()); });
+            
         }
         Debug.WriteLine("Background worker should have stopped at this moment...");
         ConstructWorker();

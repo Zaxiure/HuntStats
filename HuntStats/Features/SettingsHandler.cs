@@ -35,11 +35,15 @@ public class GetSettingsCommandHandler : IRequestHandler<GetSettingsCommand, Set
             };
             await con.InsertAsync(settings);
         }
-        
+
         _appState.PathChanged(settings.Path);
 
         return settings;
     }
+}
+
+public class ColumnsClass {
+    public string name { get; set; }
 }
 
 public class InitializeDatabaseCommand : IRequest<GeneralStatus>
@@ -127,6 +131,13 @@ create table if not exists Teams
 );
 
 ");
+        var columnCheck = await con.QueryAsync<ColumnsClass>("pragma table_info(Settings)");
+        var StartWorkerOnBoot = columnCheck.FirstOrDefault(x => x.name == "StartWorkerOnBoot");
+        if (StartWorkerOnBoot == null)
+        {
+            con.QueryAsync(@"alter table Settings
+                                    add StartWorkerOnBoot integer default 0 not null;");
+        }
 
         return GeneralStatus.Succes;
     }
@@ -134,12 +145,12 @@ create table if not exists Teams
 
 public class UpdateSettingsCommand : IRequest<GeneralStatus>
 {
-    public UpdateSettingsCommand(string path)
+    public UpdateSettingsCommand(Settings settings)
     {
-        Path = path;
+        Settings = settings;
     }
 
-    public string Path { get; set; }
+    public Settings Settings { get; set; }
 }
 
 public class UpdateSettingsCommandHandler : IRequestHandler<UpdateSettingsCommand, GeneralStatus>
@@ -155,24 +166,26 @@ public class UpdateSettingsCommandHandler : IRequestHandler<UpdateSettingsComman
     
     public async Task<GeneralStatus> Handle(UpdateSettingsCommand request, CancellationToken cancellationToken)
     {
-        var huntFilePath = request.Path + @"\user\profiles\default\attributes.xml";
+        var huntFilePath = request.Settings.Path + @"\user\profiles\default\attributes.xml";
         var fileExists = File.Exists(huntFilePath);
         using var con = await _connectionFactory.GetOpenConnectionAsync();
         var settings = await con.FirstOrDefaultAsync<Settings>(x => x.Id == 1);
-        if (!fileExists) request.Path = "";
+        if (!fileExists) request.Settings.Path = "";
         if (settings == null)
         {
             await con.InsertAsync(new Settings()
             {
-                Path = request.Path
+                Path = request.Settings.Path,
+                StartWorkerOnBoot = request.Settings.StartWorkerOnBoot
             });
         }
         else
         {
-            settings.Path = request.Path;
+            settings.Path = request.Settings.Path;
+            settings.StartWorkerOnBoot = request.Settings.StartWorkerOnBoot;
             await con.UpdateAsync(settings);
         }
-        _appState.PathChanged(request.Path);
+        _appState.PathChanged(request.Settings.Path);
         if (!fileExists) return GeneralStatus.Error;
 
         return GeneralStatus.Succes;
