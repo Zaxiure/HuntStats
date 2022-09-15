@@ -37,7 +37,15 @@ public class ConnectionFactory : IDbConnectionFactory
 
     private DbConnection GetConnection()
     {
-        DbConnection connection = new SqliteConnection("Data Source=HuntStats.sqlite");
+        var oldFilePath = "HuntStats.sqlite";
+        var newFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/HuntStats/HuntStats.sqlite";
+        if (File.Exists(oldFilePath))
+        {
+            File.Copy(oldFilePath, newFilePath);
+            Task.Delay(500);
+            File.Delete(oldFilePath);
+        }
+        DbConnection connection = new SqliteConnection($"Data Source={newFilePath}");
         return connection;
     }
 }
