@@ -92,6 +92,30 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
             }
         }
     }
+
+    public async Task CopyWhenFileUnlocked(string path, string path2)
+    {
+        try
+        {
+            File.Copy(path, path2);
+        }
+        catch (Exception e)
+        {
+            await CopyWhenFileUnlocked(path, path2);
+        }
+    }
+    
+    public async Task DeleteWhenFileUnlocked(string path)
+    {
+        try
+        {
+            File.Delete(path);
+        }
+        catch (Exception e)
+        {
+            await DeleteWhenFileUnlocked(path);
+        }
+    }
     
     // This needs to be cleaned up because holy shit....
     public async Task<GeneralStatus> Handle(XmlFileQuery request, CancellationToken cancellationToken)
@@ -113,7 +137,8 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
 
         if (!File.Exists(huntFileTempPath))
         {
-            File.Copy(huntFilePath, huntFileTempPath);
+            await CopyWhenFileUnlocked(huntFilePath, huntFileTempPath);
+            await CopyWhenFileUnlocked(huntFileTempPath, huntFileTempPath + ".tmp");
         }
         else
         {
@@ -122,7 +147,8 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
                 await Task.Delay(500);
                 File.Delete(huntFileTempPath + ".tmp");
             }
-            File.Copy(huntFilePath, huntFileTempPath + ".tmp");
+            await CopyWhenFileUnlocked(huntFilePath, huntFileTempPath + ".tmp");
+            // File.Copy(huntFilePath, huntFileTempPath + ".tmp");
             sameFile = CheckSameMatch(huntFileTempPath + ".tmp", huntFileTempPath);
             await Task.Delay(500);
             if (sameFile)
@@ -134,7 +160,8 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
         if(!sameFile)
         {
             File.Delete(huntFileTempPath);
-            File.Copy(huntFilePath, huntFileTempPath);
+            await CopyWhenFileUnlocked(huntFileTempPath + ".tmp", huntFileTempPath);
+            // File.Copy(huntFilePath, huntFileTempPath);
             File.Delete(huntFileTempPath + ".tmp");
             XmlSerializer reader = new XmlSerializer(typeof(Attributes));  
             StreamReader file = new System.IO.StreamReader(huntFileTempPath);  
