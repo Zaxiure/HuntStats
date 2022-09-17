@@ -112,6 +112,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var appdataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\HuntStats";
+        if(!Directory.Exists(appdataDirectory)) Directory
+            .CreateDirectory(appdataDirectory);
         await _mediator.Send(new InitializeDatabaseCommand());
         _appState.CloseSidebarEvent += ToggleSidebar;
         _appState.PathChangedEvent += AppStateOnPathChangedEvent;
@@ -132,7 +135,7 @@
         {
             if (!File.Exists(Path + @"\user\profiles\default\attributes.xml"))
             {
-                if(!worker.CancellationPending || worker.IsBusy) worker.CancelAsync();
+                if (!worker.CancellationPending && worker.IsBusy) worker.CancelAsync();
             }
         }
         StateHasChanged();
@@ -161,7 +164,6 @@
         {
             Thread.Sleep(10*1000);
             var result = Task.Run(() => { _mediator.Send(new XmlFileQuery()); });
-            
         }
         Debug.WriteLine("Background worker should have stopped at this moment...");
         ConstructWorker();
