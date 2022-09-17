@@ -86,9 +86,10 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
             foreach (var accoladeEntry in attributes.Where(x => x.Key.Contains("MissionAccoladeEntry_" + i)))
             {
                 total += 1;
-                if (attributes2[accoladeEntry.Key] == accoladeEntry.Value)
+                if (attributes2.ContainsKey(accoladeEntry.Key) && attributes2[accoladeEntry.Key] == accoladeEntry.Value)
                 {
                     succes += 1;
+                    // if(attributes2[accoladeEntry.Key] == accoladeEntry.Value)
                 }
             }
         }
@@ -98,7 +99,7 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
             foreach (var missionBagEntry in attributes.Where(x => x.Key.Contains("MissionBagEntry_" + i)))
             {
                 total += 1;
-                if (attributes2[missionBagEntry.Key] == missionBagEntry.Value)
+                if (attributes2.ContainsKey(missionBagEntry.Key) && attributes2[missionBagEntry.Key] == missionBagEntry.Value)
                 {
                     succes += 1;
                 }
@@ -110,7 +111,7 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
             foreach (var playerEntry in attributes.Where(x => x.Key.Contains("MissionBagPlayer_" + i)))
             {
                 total += 1;
-                if (attributes2[playerEntry.Key] == playerEntry.Value)
+                if (attributes2.ContainsKey(playerEntry.Key) && attributes2[playerEntry.Key] == playerEntry.Value)
                 {
                     succes += 1;
                 }
