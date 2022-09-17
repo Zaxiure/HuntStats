@@ -49,48 +49,83 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
     {
         XmlSerializer reader = new XmlSerializer(typeof(Attributes));  
         XmlSerializer reader2 = new XmlSerializer(typeof(Attributes));
-        using (StreamReader file = new System.IO.StreamReader(filePath1))
+        var fileText = File.ReadAllText(filePath1);
+        var fileText2 = File.ReadAllText(filePath2);
+        var file = new StringReader(fileText);
+        var file2 = new StringReader(fileText2);
+        Attributes overview =  (Attributes)reader.Deserialize(file);
+        Attributes overview2 =  (Attributes)reader2.Deserialize(file2);
+        
+        var attributes = new Dictionary<string, string>();
+    
+        foreach (var attr in overview.Atrributes)
         {
-            using (StreamReader file2 = new System.IO.StreamReader(filePath2))
+            attributes.Add(attr.Name, attr.Value);
+        }
+        
+        var attributes2 = new Dictionary<string, string>();
+    
+        foreach (var attr in overview2.Atrributes)
+        {
+            attributes2.Add(attr.Name, attr.Value);
+        }
+    
+        var total = 0;
+        var succes = 0;
+        
+        var numberOfTeams = Convert.ToInt32(attributes.FirstOrDefault(x => x.Key == "MissionBagNumTeams").Value);
+        var numberOfEntries = Convert.ToInt32(attributes.FirstOrDefault(x => x.Key == "MissionBagNumEntries").Value);
+        var numberOfAccolades = Convert.ToInt32(attributes.FirstOrDefault(x => x.Key == "MissionBagNumAccolades").Value);
+        
+        var numberOfTeams2 = Convert.ToInt32(attributes.FirstOrDefault(x => x.Key == "MissionBagNumTeams").Value);
+        var numberOfEntries2 = Convert.ToInt32(attributes.FirstOrDefault(x => x.Key == "MissionBagNumEntries").Value);
+        var numberOfAccolades2 = Convert.ToInt32(attributes.FirstOrDefault(x => x.Key == "MissionBagNumAccolades").Value);
+    
+        for (int i = 0; i < numberOfAccolades; i++)
+        {
+            foreach (var accoladeEntry in attributes.Where(x => x.Key.Contains("MissionAccoladeEntry_" + i)))
             {
-                Attributes overview =  (Attributes)reader.Deserialize(file);
-                Attributes overview2 =  (Attributes)reader2.Deserialize(file2);
-                
-                var attributes = new Dictionary<string, string>();
-            
-                foreach (var attr in overview.Atrributes)
+                total += 1;
+                if (attributes2[accoladeEntry.Key] == accoladeEntry.Value)
                 {
-                    attributes.Add(attr.Name, attr.Value);
+                    succes += 1;
                 }
-                
-                var attributes2 = new Dictionary<string, string>();
-            
-                foreach (var attr in overview2.Atrributes)
-                {
-                    attributes2.Add(attr.Name, attr.Value);
-                }
-        
-                var total = 0;
-                var succes = 0;
-        
-                foreach (var overviewAtrribute in attributes.Where(x => x.Key.Contains("Mission")))
-                {
-                    total += 1;
-                    if (attributes2[overviewAtrribute.Key] == overviewAtrribute.Value)
-                    {
-                        succes += 1;
-                    }
-                }
-        
-                var percentage = Convert.ToInt32((double)succes / total * 100);
-                if (percentage > 80)
-                {
-                    return true;
-                }
-        
-                return false;
             }
         }
+        
+        for (int i = 0; i < numberOfEntries; i++)
+        {
+            foreach (var missionBagEntry in attributes.Where(x => x.Key.Contains("MissionBagEntry_" + i)))
+            {
+                total += 1;
+                if (attributes2[missionBagEntry.Key] == missionBagEntry.Value)
+                {
+                    succes += 1;
+                }
+            }
+        }
+        
+        for (int i = 0; i < numberOfTeams; i++)
+        {
+            foreach (var playerEntry in attributes.Where(x => x.Key.Contains("MissionBagPlayer_" + i)))
+            {
+                total += 1;
+                if (attributes2[playerEntry.Key] == playerEntry.Value)
+                {
+                    succes += 1;
+                }
+            }
+        }
+        
+        var percentage = Convert.ToInt32((double)succes / total * 100);
+        if (percentage > 80)
+        {
+            return true;
+        }
+    
+        return false;
+        //     }
+        // }
     }
 
     public async Task CopyWhenFileUnlocked(string path, string path2)
@@ -101,6 +136,7 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
         }
         catch (Exception e)
         {
+            await Task.Delay(100);
             await CopyWhenFileUnlocked(path, path2);
         }
     }
@@ -138,31 +174,20 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
         if (!File.Exists(huntFileTempPath))
         {
             await CopyWhenFileUnlocked(huntFilePath, huntFileTempPath);
-            await CopyWhenFileUnlocked(huntFileTempPath, huntFileTempPath + ".tmp");
+            // await CopyWhenFileUnlocked(huntFileTempPath, huntFileTempPath + ".tmp");
         }
         else
         {
-            if (File.Exists(huntFileTempPath + ".tmp"))
-            {
-                await Task.Delay(500);
-                File.Delete(huntFileTempPath + ".tmp");
-            }
-            await CopyWhenFileUnlocked(huntFilePath, huntFileTempPath + ".tmp");
-            // File.Copy(huntFilePath, huntFileTempPath + ".tmp");
-            sameFile = CheckSameMatch(huntFileTempPath + ".tmp", huntFileTempPath);
-            await Task.Delay(500);
-            if (sameFile)
-            {
-                File.Delete(huntFileTempPath + ".tmp");
-            }
+            // await CopyWhenFileUnlocked(huntFilePath, huntFileTempPath + ".tmp");
+            sameFile = CheckSameMatch(huntFilePath, huntFileTempPath);
         }
         
         if(!sameFile)
         {
             File.Delete(huntFileTempPath);
-            await CopyWhenFileUnlocked(huntFileTempPath + ".tmp", huntFileTempPath);
+            await CopyWhenFileUnlocked(huntFilePath, huntFileTempPath);
             // File.Copy(huntFilePath, huntFileTempPath);
-            File.Delete(huntFileTempPath + ".tmp");
+            // File.Delete(huntFileTempPath + ".tmp");
             XmlSerializer reader = new XmlSerializer(typeof(Attributes));  
             StreamReader file = new System.IO.StreamReader(huntFileTempPath);  
             

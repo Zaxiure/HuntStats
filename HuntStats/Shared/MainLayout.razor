@@ -164,7 +164,6 @@
         {
             Thread.Sleep(10*1000);
             var result = Task.Run(() => { _mediator.Send(new XmlFileQuery()); });
-            
         }
         Debug.WriteLine("Background worker should have stopped at this moment...");
         ConstructWorker();
