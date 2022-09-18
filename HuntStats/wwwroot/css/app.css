@@ -4,6 +4,11 @@ html, body {
   font-family: "Exo 2", sans-serif;
   background-color: #1e2026 !important;
   color: #fff !important;
+  user-select: none; /* supported by Chrome and Opera */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
 }
 
 body.no-anim * {
@@ -825,16 +830,46 @@ input.form-control {
 }
 
 .team {
-  border: 1px solid #343740;
-  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
   margin: 15px;
-}
-.team .team-title {
-  padding: 5px 15px;
 }
 .team .team-player {
   padding: 5px 15px;
-  border-top: 1px solid #343740;
+  margin-bottom: 15px;
+  border: 1px solid #343740;
+  border-right: unset;
+  text-overflow: ellipsis;
+}
+.team .btn.team-player:hover {
+  border-color: #0a58ca;
+}
+.team .team-player:last-of-type {
+  border-right: 1px solid #343740;
+}
+
+.btn-primary:disabled {
+  cursor: not-allowed !important;
+}
+
+.team-title {
+  padding: 5px 15px;
+  font-weight: bolder;
+  font-size: 24px;
+}
+
+.totals {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+.totals > div {
+  flex-shrink: 0;
+  margin-bottom: 5px;
+  padding: 15px;
+  border: 2px solid #343740;
+  border-radius: 15px;
 }
 
 #blazor-error-ui {

@@ -133,10 +133,18 @@ create table if not exists Teams
 ");
         var columnCheck = await con.QueryAsync<ColumnsClass>("pragma table_info(Settings)");
         var StartWorkerOnBoot = columnCheck.FirstOrDefault(x => x.name == "StartWorkerOnBoot");
+        var PlayerProfileId = columnCheck.FirstOrDefault(x => x.name == "PlayerProfileId");
         if (StartWorkerOnBoot == null)
         {
             con.QueryAsync(@"alter table Settings
                                     add StartWorkerOnBoot integer default 0 not null;");
+        }
+
+        if (PlayerProfileId == null)
+        {
+            con.QueryAsync(@"alter table Settings
+                add PlayerProfileId nvarchar;
+            ");
         }
 
         return GeneralStatus.Succes;
@@ -182,6 +190,7 @@ public class UpdateSettingsCommandHandler : IRequestHandler<UpdateSettingsComman
         else
         {
             settings.Path = request.Settings.Path;
+            settings.PlayerProfileId = request.Settings.PlayerProfileId;
             settings.StartWorkerOnBoot = request.Settings.StartWorkerOnBoot;
             await con.UpdateAsync(settings);
         }

@@ -46,7 +46,7 @@ public class Player
 {
     public int Id { get; set; }
 
-    public int ProfileId { get; set; }
+    public string ProfileId { get; set; }
     public String Name { get; set; }
     public int Mmr { get; set; }
 

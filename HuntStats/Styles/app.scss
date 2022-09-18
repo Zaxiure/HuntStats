@@ -5,6 +5,11 @@ html, body {
   font-family: "Exo 2",sans-serif;
   background-color: #1e2026 !important;
   color: #fff !important;
+  user-select: none; /* supported by Chrome and Opera */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
 }
 
 body.no-anim * {

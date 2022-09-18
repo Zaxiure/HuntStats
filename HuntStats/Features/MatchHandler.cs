@@ -2,6 +2,7 @@
 using ConsoleApp1.Models;
 using Dommel;
 using HuntStats.Data;
+using HuntStats.Models;
 using MediatR;
 using Newtonsoft.Json;
 
@@ -16,7 +17,6 @@ public class GetMatchbyIdCommand : IRequest<HuntMatch>
 
     public int Id { get; set; }
 }
-
 public class GetMatchbyIdCommandHandler : IRequestHandler<GetMatchbyIdCommand, HuntMatch>
 {
     private readonly IDbConnectionFactory _connectionFactory;
@@ -51,6 +51,32 @@ public class GetMatchbyIdCommandHandler : IRequestHandler<GetMatchbyIdCommand, H
         }).Select(x => x.Result);
 
         return mappedHuntMatch.FirstOrDefault();
+    }
+}
+
+public class GetAccoladesByMatchIdCommand : IRequest<List<Accolade>> {
+
+    public GetAccoladesByMatchIdCommand(int matchId)
+    {
+        MatchId = matchId;
+    }
+
+    public int MatchId { get; set; }
+}
+
+public class GetAccoladesByMatchIdCommandHandler : IRequestHandler<GetAccoladesByMatchIdCommand, List<Accolade>>
+{
+    private readonly IDbConnectionFactory _connectionFactory;
+
+    public GetAccoladesByMatchIdCommandHandler(IDbConnectionFactory connectionFactory)
+    {
+        _connectionFactory = connectionFactory;
+    }
+    public async Task<List<Accolade>> Handle(GetAccoladesByMatchIdCommand request, CancellationToken cancellationToken)
+    {
+        var con = await _connectionFactory.GetOpenConnectionAsync();
+        var accolades = await con.SelectAsync<Accolade>(x => x.MatchId == request.MatchId);
+        return accolades.ToList();
     }
 }
 
