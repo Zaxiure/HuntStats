@@ -118,7 +118,7 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
         }
         
         var percentage = Convert.ToInt32((double)succes / total * 100);
-        if (percentage == 100)
+        if (percentage > 90)
         {
             return true;
         }
