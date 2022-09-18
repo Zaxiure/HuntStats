@@ -858,6 +858,10 @@ input.form-control {
   font-size: 24px;
 }
 
+.team-player.blue-background {
+  background-color: rgba(13, 202, 240, 0.2) !important;
+}
+
 .totals {
   display: flex;
   flex-direction: row;

@@ -1,7 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
-using ConsoleApp1.Models;
 using Dommel;
 using HuntStats.Data;
 using HuntStats.Models;
@@ -119,7 +118,7 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
         }
         
         var percentage = Convert.ToInt32((double)succes / total * 100);
-        if (percentage > 80)
+        if (percentage == 100)
         {
             return true;
         }

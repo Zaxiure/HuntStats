@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using ConsoleApp1.Models;
 using Dommel;
 using HuntStats.Data;
 using HuntStats.Models;
