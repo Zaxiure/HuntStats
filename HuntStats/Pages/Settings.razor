@@ -6,9 +6,9 @@
 @inject IFolderPicker _folderPicker
 
 <div class="card-container" style="max-width: 1280px;margin:  auto;">
+    <h3>Settings</h3>
     <div class="card">
         <div class="card-body">
-            <h3>Settings</h3>
             
             <form>
                 <div class="form-group row">
@@ -32,7 +32,7 @@
                         }
                     </div>
                 </div>
-                <div class="form-group row">
+                <div class="form-group row mt-3">
                     <label for="staticEmail" class="col-sm-4 col-form-label">Start background worker when opening application</label>
                     <div class="col-sm-8">
                         @if (HuntSettings.Path == null || HuntSettings.Path == string.Empty || FileNotFound)
@@ -47,6 +47,24 @@
                                 @(HuntSettings.StartWorkerOnBoot ? "On" : "Off")
                             </div>
                         }
+                    </div>
+                </div>
+                <div class="form-group row mt-3">
+                    <label for="staticEmail" class="col-sm-4 col-form-label">Reset selected player</label>
+                    <div class="col-sm-8">
+                        @if (HuntSettings.PlayerProfileId == null || HuntSettings.PlayerProfileId == string.Empty)
+                        {
+                            <button disabled class="btn btn-primary">
+                                Reset
+                            </button>
+                        }
+                        else
+                        {
+                            <div @onclick="ResetProfileId" class="btn btn-primary">
+                                Reset
+                            </div>
+                        }
+                        <small class="form-text d-block">This is the player you selected as yourself on the matchscreen.</small>
                     </div>
                 </div>
             </form>
@@ -86,6 +104,12 @@
     private async Task ToggleStartBackgroundWorkerOnBoot()
     {
         HuntSettings.StartWorkerOnBoot = !HuntSettings.StartWorkerOnBoot;
+        await _mediator.Send(new UpdateSettingsCommand(HuntSettings));
+    }
+
+    private async Task ResetProfileId()
+    {
+        HuntSettings.PlayerProfileId = "";
         await _mediator.Send(new UpdateSettingsCommand(HuntSettings));
     }
 }

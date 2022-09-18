@@ -6,4 +6,6 @@ public class Settings
     public string Path { get; set; }
 
     public bool StartWorkerOnBoot { get; set; }
+
+    public string PlayerProfileId { get; set; }
 }

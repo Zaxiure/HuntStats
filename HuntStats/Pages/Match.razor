@@ -7,9 +7,11 @@
 @inject IFolderPicker FolderPicker
 @inject NavigationManager NavigationManager
 
-<div class="card-container" style="max-width: 1280px;margin: auto;">
+<div class="card-container" style="margin: auto;">
     <div class="d-flex justify-content-between mb-3">
-        <div class="left"></div>
+        <div class="left">
+            <h3>Match: @HuntMatch.DateTime.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss")</h3>
+        </div>
         <div class="right">
             <div class="btn btn-primary" @onclick='() => { NavigationManager.NavigateTo("/match"); }'>Back</div>
         </div>
@@ -17,21 +19,58 @@
     <div class="card">
         @if (HuntMatch != null)
         {
-            
             <div class="card-body">
-                <h3>Match: @HuntMatch.DateTime.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss")</h3>
-                @foreach (var team in HuntMatch.Teams)
-                {
-                    <div class="team">
-                        <div class="team-title">Team #@(HuntMatch.Teams.IndexOf(team)+1)</div>
-                        @foreach (var player in team.Players)
+                <div class="totals">
+                    <div class="kills">
+                        Total kills: @Kills
+                    </div>
+                    <div class="kills">
+                        Your Kills: @YourKills
+                    </div>
+                    <div class="assists">
+                        Kill Assists: @Assists
+                    </div>
+                    <div class="deaths">
+                        Deaths: @Deaths
+                    </div>
+                    @if (EventPoints != null)
+                    {
+                        <div class="eventpoints">
+                            Event Points: @EventPoints
+                        </div>
+                    }
+                </div>
+                <div class="teams w-50">
+                    <div class="d-flex flex-row pt-4 flex-wrap">
+                        @foreach (var team in HuntMatch.Teams)
                         {
-                            <div class="team-player">
-                                @player.Name
+                            <div @onclick="() => { Team = team; }" class="btn btn-primary ms-3 mb-3 flex-shrink-0">Team @(HuntMatch.Teams.IndexOf(team)+1)@(team.Players.FirstOrDefault(x => x.ProfileId.ToString() == Settings.PlayerProfileId) != null ? " (Own Team)" : "")</div>
+                        }
+                    </div>
+                    <div class="team-container">
+                        <div class="team-title">Team #@(HuntMatch.Teams.IndexOf(Team) + 1)</div>
+                        @foreach (var player in Team.Players)
+                        {
+                            <div class="team d-flex flex-row">
+                                <div class="team-player w-25 text-nowrap overflow-hidden">
+                                    @player.Name
+                                </div>
+                                @if (Settings.PlayerProfileId == null || Settings.PlayerProfileId == string.Empty)
+                                {
+                                    if (player.ProfileId != "0")
+                                    {
+                                        <div @onclick="() => { UpdateProfile(player.ProfileId.ToString()); }" class="btn btn-primary team-player" style="border-radius: 0 !important;border-width: 1px">
+                                            This is me!
+                                        </div>
+                                    }
+                                }
+                                <div class="team-player">
+                                    MMR: @player.Mmr
+                                </div>
                             </div>
                         }
                     </div>
-                }
+                </div>
             </div>
         }
     </div>
@@ -44,6 +83,20 @@
 
     public HuntMatch HuntMatch { get; set; }
 
+    public Team Team { get; set; }
+    public Models.Settings Settings { get; set; }
+
+    public List<Accolade> Accolades { get; set; }
+
+    public int Kills { get; set; }
+
+    public int Assists { get; set; } = 0;
+
+    public int Deaths { get; set; }
+
+    public int YourKills { get; set; }
+
+    public int? EventPoints { get; set; } = null;
 
 
     protected override async Task OnInitializedAsync()
@@ -51,6 +104,20 @@
         if (Id != null)
         {
             HuntMatch = await Mediator.Send(new GetMatchbyIdCommand(Id));
+            Team = HuntMatch.Teams[0];
+            Accolades = await Mediator.Send((new GetAccoladesByMatchIdCommand(Id)));
+            Settings = await Mediator.Send(new GetSettingsCommand());
+            Kills = HuntMatch.Teams.Select(x => x.Players.Select(y => y.KilledByMe + y.DownedByMe + y.KilledByTeammate + y.DownedByTeammate).Sum()).Sum();
+            YourKills = HuntMatch.Teams.Select(x => x.Players.Select(y => y.KilledByMe + y.DownedByMe).Sum()).Sum();
+            if (Accolades.FirstOrDefault(x => x.Category == "accolade_players_killed_assist") != null) Assists = Accolades.FirstOrDefault(x => x.Category == "accolade_players_killed_assist").Hits;
+            Deaths = HuntMatch.Teams.Select(x => x.Players.Select(y => y.KilledMe + y.DownedMe).Sum()).Sum();
+            if (Accolades.FirstOrDefault(x => x.Category == "accolade_gained_serpent2022_event_points") != null) EventPoints = Accolades.FirstOrDefault(x => x.Category == "accolade_gained_serpent2022_event_points").Hits;
         }
+    }
+
+    private async Task UpdateProfile(string profileId)
+    {
+        Settings.PlayerProfileId = profileId;
+        await Mediator.Send(new UpdateSettingsCommand(Settings));
     }
 }

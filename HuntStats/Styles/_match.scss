@@ -1,16 +1,64 @@
 .team {
-  border: 1px solid #343740;
-  border-radius: 10px;
+  display: flex;
+  //flex-wrap: wrap;;
+  flex-direction: column;
   //padding: 15px;
   margin: 15px;
   
-  .team-title {
-    padding: 5px 15px;
-    //border-bottom: 1px solid #343740;
-  }
   
   .team-player {
     padding: 5px 15px;
-    border-top: 1px solid #343740;
+    margin-bottom: 15px;
+    //border-radius: 10px;
+    border: 1px solid #343740;
+    border-right: unset;
+    text-overflow: ellipsis;
+    //border-top: 1px solid #343740;
+  }
+  
+  .btn.team-player:hover {
+    border-color:#0a58ca;
+  }
+  
+  .team-player:last-of-type {
+    border-right: 1px solid #343740;
+  }
+  
+}
+
+.btn-primary:disabled {
+  cursor: not-allowed !important;
+}
+
+
+.team-title {
+  padding: 5px 15px;
+  font-weight: bolder;
+  font-size: 24px;
+  //border-bottom: 1px solid #343740;
+}
+
+.totals {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  
+  & > div {
+    flex-shrink: 0;
+    margin-bottom: 5px;
+    padding: 15px;
+    border: 2px solid #343740;
+    border-radius: 15px;
   }
 }
+
+//
+//.kills {
+//    border-radius: 15px;
+//}
+//
+//.deaths {
+//    border: 1px solid #343740;
+//    border-radius:15px;
+//}

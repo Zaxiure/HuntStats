@@ -16,18 +16,24 @@
 @inject AppState AppState
 
 <div class="card-container" style="max-width: 1280px;margin:  auto;">
+    <h3>Matchasdfasdfasdes</h3>
     <div class="card">
         <div class="card-body">
-            <h3>Matches</h3>
             
             <div class="table-wrapper">
                 <table class="table table-dark data-table" style="margin-bottom: 0 !important;">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Date</th>
+                            <th scope="col">Datssse</th>
                             <th scope="col">Teams</th>
                             <th scope="col">Total Players</th>
+                            @if (Settings.PlayerProfileId != null || Settings.PlayerProfileId != string.Empty || Settings.PlayerProfileId != "0")
+                            {
+                                <th>
+                                    MMR
+                                </th>
+                            }
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -39,6 +45,15 @@
                             <td>@match.DateTime.ToLocalTime()</td>
                             <td>@match.Teams.Count</td>
                             <td>@match.Teams.Select(x => x.Players.Count).Sum()</td>
+                            @if (Settings.PlayerProfileId != null || Settings.PlayerProfileId != string.Empty || Settings.PlayerProfileId != "0")
+                            {
+                                <td>
+                                    @if (match.Teams.FirstOrDefault(x => x.Players.FirstOrDefault(y => y.ProfileId == Settings.PlayerProfileId) != null) != null)
+                                    {
+                                        @match.Teams.FirstOrDefault(x => x.Players.FirstOrDefault(y => y.ProfileId == Settings.PlayerProfileId) != null).Players.FirstOrDefault(x => x.ProfileId == Settings.PlayerProfileId).Mmr
+                                    }
+                                </td>
+                            }
                             <td>
                                 <div @onclick='() => { NavigationManager.NavigateTo("/match/" + match.Id); }' class="btn btn-primary">
                                     <i class="fal fa-eye"></i>
@@ -64,11 +79,13 @@
     public bool RunBackgroundTask { get; set; } = false;
     public string FilePath { get; set; }
     public string Path { get; set; } = "";
+    public Models.Settings Settings { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         AppState.NewMatchAdded += AppStateOnNewMatchAdded;
         Matches = await Mediator.Send(new GetMatchCommand());
+        Settings = await Mediator.Send(new GetSettingsCommand());
     }
 
     private async void AppStateOnNewMatchAdded()

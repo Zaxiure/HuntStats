@@ -190,7 +190,8 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
             // File.Copy(huntFilePath, huntFileTempPath);
             // File.Delete(huntFileTempPath + ".tmp");
             XmlSerializer reader = new XmlSerializer(typeof(Attributes));  
-            StreamReader file = new System.IO.StreamReader(huntFileTempPath);  
+            var fileText = File.ReadAllText(huntFileTempPath);
+            var file = new StringReader(fileText);  
             
     
             Attributes overview =  (Attributes)reader.Deserialize(file);
@@ -267,6 +268,7 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
                     team.Players.Add(new Player()
                     {
                         Name = attributes["MissionBagPlayer_" + i + "_" + j +"_blood_line_name"],
+                        ProfileId = attributes["MissionBagPlayer_" + i + "_" + j + "_profileid"],
                         Mmr = Convert.ToInt32(attributes["MissionBagPlayer_" + i + "_" + j + "_mmr"]),
                         KilledMe = Convert.ToInt32(attributes["MissionBagPlayer_" + i + "_" + j + "_killedme"]),
                         DownedMe = Convert.ToInt32(attributes["MissionBagPlayer_" + i + "_" + j + "_downedme"]),
