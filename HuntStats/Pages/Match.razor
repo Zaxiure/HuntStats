@@ -49,14 +49,14 @@
                     @foreach (var player in Team.Players)
                     {
                         <div class="team d-flex flex-row">
-                            <div class="team-player text-nowrap overflow-hidden" style="width:200px;">
+                            <div class="team-player text-nowrap overflow-hidden" style="width: 200px;">
                                 @player.Name
                             </div>
                             @if (Settings.PlayerProfileId == null || Settings.PlayerProfileId == string.Empty)
                             {
                                 if (player.ProfileId != "0")
                                 {
-                                    <div @onclick="() => { UpdateProfile(player.ProfileId.ToString()); }" class="btn btn-primary team-player" style="border-radius: 0 !important;border-width: 1px">
+                                    <div @onclick="() => { UpdateProfile(player.ProfileId.ToString()); }" class="btn btn-primary team-player" style="border-radius: 0 !important; border-width: 1px">
                                         This is me!
                                     </div>
                                 }
@@ -74,51 +74,68 @@
                             </div>
                             @for (int i = 0; i < player.DownedByMe; i++)
                             {
-                                <div class="team-player">
-                                    <i class="fas fa-skull"></i>
-                                </div>
+                                <Tooltip Text="You downed this hunter.">
+                                    <div class="team-player">
+                                        <i class="fas fa-skull"></i>
+                                    </div>
+                                </Tooltip>
                             }
                             @for (int i = 0; i < player.DownedByTeammate; i++)
                             {
-                                <div class="team-player blue-background">
-                                    <i class="fas fa-skull"></i>
-                                </div>
+                                <Tooltip Text="Your teammate downed this hunter.">
+                                    <div class="team-player blue-background">
+                                        <i class="fas fa-skull"></i>
+                                    </div>
+                                </Tooltip>
                             }
                             @for (int i = 0; i < player.DownedMe; i++)
                             {
-                                <div class="team-player">
-                                    <i class="fas fa-skull"></i>
-                                </div>
+                                <Tooltip Text="This hunter downed you">
+                                    <div class="team-player">
+                                        <i class="fas fa-tombstone"></i>
+                                    </div>
+                                </Tooltip>
                             }
                             @for (int i = 0; i < player.DownedTeammate; i++)
                             {
-                                <div class="team-player blue-background">
-                                    <i class="fas fa-skull"></i>
-                                </div>
+                                <Tooltip Text="This hunter downed your teammate.">
+                                    <div class="team-player blue-background">
+                                        <i class="fas fa-tombstone"></i>
+                                    </div>
+                                </Tooltip>
                             }
                             @for (int i = 0; i < player.KilledByMe; i++)
                             {
-                                <div class="team-player">
-                                    <i class="fas fa-skull" style="color: #ff0000;fill: #ff0000;"></i>
-                                </div>
+                                <Tooltip Text="Your teammate downed this hunter.">
+                                    <div class="team-player">
+                                        <i class="fas fa-skull" style="color: #ff0000; fill: #ff0000;"></i>
+                                    </div>
+                                </Tooltip>
                             }
                             @for (int i = 0; i < player.KilledByTeammate; i++)
                             {
-                                <div class="team-player blue-background">
-                                    <i class="fas fa-skull" style="color: #ff0000;fill: #ff0000;"></i>
-                                </div>
+                                <Tooltip Text="Your teammate killed this hunter.">
+                                    <div class="team-player blue-background">
+                                        <i class="fas fa-skull" style="color: #ff0000; fill: #ff0000;"></i>
+                                    </div>
+                                </Tooltip>
                             }
                             @for (int i = 0; i < player.KilledMe; i++)
                             {
-                                <div class="team-player">
-                                    <i class="fas fa-skull" style="color: #ff0000;fill: #ff0000;"></i>
-                                </div>
+                                <Tooltip Text="This hunter killed you.">
+                                    <div class="team-player">
+                                        <i class="fas fa-tombstone" style="color: #ff0000; fill: #ff0000;"></i>
+                                    </div>
+                                </Tooltip>
                             }
                             @for (int i = 0; i < player.KilledTeammate; i++)
                             {
-                                <div class="team-player blue-background">
-                                    <i class="fas fa-skull" style="color: #ff0000;fill: #ff0000;"></i>
-                                </div>
+                                <Tooltip Text="This hunter killed your teammate.">
+
+                                    <div class="team-player blue-background">
+                                        <i class="fas fa-tombstone" style="color: #ff0000; fill: #ff0000;"></i>
+                                    </div>
+                                </Tooltip>
                             }
                         </div>
                     }
