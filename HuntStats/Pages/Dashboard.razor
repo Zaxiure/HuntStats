@@ -1,0 +1,101 @@
+﻿@page "/dashboard"
+@using System.Diagnostics
+@using System.ComponentModel
+@using Dapper
+@using Dommel
+@using HuntStats.Data
+@using HuntStats.Features
+@using HuntStats.Models
+@using HuntStats.State
+@using MediatR
+@inject IFolderPicker _folderPicker
+@inject IDbConnectionFactory _connectionFactory;
+@inject IMediator Mediator
+@inject NavigationManager NavigationManager
+@inject AppState AppState
+@inject IJSRuntime JS
+
+<div class="card-container" style="max-width: 1280px;margin:  auto;">
+    <div class="card">
+        <div class="card-body">
+            <h3>Info</h3>
+            
+            <canvas @ref="_chart" id="chart" width="400" height="400">
+                
+            </canvas>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    private ElementReference _chart;
+
+    public List<HuntMatch> Matches;
+    public BackgroundWorker worker { get; set; }
+    public Models.Settings Settings;
+    public bool RunBackgroundTask { get; set; } = false;
+    public string FilePath { get; set; }
+    public string Path { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Yield();
+        AppState.NewMatchAdded += AppStateOnNewMatchAdded;
+        Matches = await Mediator.Send(new GetMatchCommand());
+        Settings = await Mediator.Send(new GetSettingsCommand());
+        var test = Matches.Select(x =>
+        {
+            var team = x.Teams.FirstOrDefault(x => x.Players.FirstOrDefault(y => y.ProfileId == Settings.PlayerProfileId) != null);
+            if (team != null)
+            {
+                var mmr = team.Players.FirstOrDefault(y => y.ProfileId == Settings.PlayerProfileId).Mmr;
+                return new
+                {
+                    DateTime = x.DateTime,
+                    Mmr = mmr
+                };
+            }
+            return null;
+    // return false;
+        }).Where(x => x != null);
+        await JS.InvokeAsync<string>("createChart", _chart, new
+        {
+            labels = test.Select(x => x.DateTime.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss")),
+            datasets = new List<Dataset>()
+            {
+                new Dataset()
+                {
+                    Label = "Mmr",
+                    Data = test.Select(x => x.Mmr).ToList(),
+                    Fill = true,
+                    BorderColor = "rgb(75, 192, 192)",
+                    Tension = 0.5
+                }
+            } 
+        });
+    }
+
+    private async void AppStateOnNewMatchAdded()
+    {
+        Matches = await Mediator.Send(new GetMatchCommand());
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async Task ToggleCheck()
+    {
+        if (!worker.CancellationPending)
+        {
+            if (worker.IsBusy)
+            {
+                worker.CancelAsync();
+            }
+            else
+            {
+                worker.RunWorkerAsync();
+            }
+        }
+        StateHasChanged();
+    }
+}
