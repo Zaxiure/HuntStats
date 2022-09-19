@@ -31,10 +31,10 @@
 <!--        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>-->
     </PropertyGroup>
 
-<!--	<PropertyGroup>-->
-<!--		<WindowsPackageType>None</WindowsPackageType>-->
-<!--		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>-->
-<!--	</PropertyGroup>-->
+	<PropertyGroup>
+		<WindowsPackageType>None</WindowsPackageType>
+		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+	</PropertyGroup>
 
     <ItemGroup>
         <!-- App Icon -->

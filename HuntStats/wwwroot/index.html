@@ -8,7 +8,8 @@
 	<link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
 	<link href="css/app.css" rel="stylesheet" />
     <link href="HuntStats.styles.css" rel="stylesheet" />
-    <script src="js/popper.min.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/chart.min.js"></script>
 </head>
 
 <body>
@@ -25,6 +26,19 @@
 	<script>
 		window.getWidth = () => {
 			return window.innerWidth
+		}
+		
+		window.createChart = (chartElement, data) => {
+			console.log(data);
+			console.log(chartElement);
+			// var labels = Utils.months({count: 7});
+			new Chart(chartElement, {
+				type: "line",
+				data: data,
+				options: {
+					responsive: false
+				}
+			})
 		}
 
 		window.createDropdown = (clickElement, dropdownElement) => {
