@@ -1,3 +1,4 @@
+![Build Passing](https://img.shields.io/github/workflow/status/zaxiure/huntstats/.NET?style=for-the-badge)
 ![HuntStats Current Version](https://img.shields.io/github/v/release/zaxiure/huntstats?style=for-the-badge)
 ![Github Downloads](https://img.shields.io/github/downloads/zaxiure/huntstats/total?style=for-the-badge)
 # HuntStats
