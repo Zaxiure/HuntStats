@@ -16,7 +16,7 @@ public partial class App : Application
 		var window = base.CreateWindow(activationState);
 		if (window != null)
 		{
-			window.Title = "HüntStäts";
+			window.Title = "HüntStäts by Zaxiure";
 		}
 
 		return window;

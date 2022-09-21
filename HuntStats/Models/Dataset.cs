@@ -18,5 +18,8 @@ public class Dataset
 
     [JsonPropertyName("tension")]
     public double Tension { get; set; }
+    
+    [JsonPropertyName("pointRadius")]
+    public double PointRadius { get; set; }
 }
 

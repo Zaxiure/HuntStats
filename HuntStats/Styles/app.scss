@@ -31,6 +31,26 @@ body.no-anim * {
 @import "_calendar.scss";
 @import "_match.scss";
 
+/*
+ *  STYLE 1
+ */
+
+*::-webkit-scrollbar-track
+{
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar
+{
+  width: 12px;
+}
+
+*::-webkit-scrollbar-thumb
+{
+  border-radius: 10px;
+  background-color: #555;
+}
+
 #blazor-error-ui {
   display: none;
 }
