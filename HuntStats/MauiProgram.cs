@@ -24,11 +24,12 @@ public static class MauiProgram
 		{
 #if WINDOWS
                 
-			lifecycle.AddWindows(windows => windows.OnWindowCreated((del) =>
-			{
-				del.Title = "HüntStäts";
-				del.ExtendsContentIntoTitleBar = true;
-			}));
+			// lifecycle.AddWindows(windows => windows.OnWindowCreated((del) =>
+			// {
+			// 	del.Title = "HüntStäts";
+			// 	del.ExtendsContentIntoTitleBar = true;
+			// 	del.
+			// }));
 #endif
 		});
 		builder.Services.AddScoped<AppState>();

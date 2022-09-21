@@ -1,7 +1,6 @@
 ﻿@page "/"
 @using System.Diagnostics
 @using System.ComponentModel
-@using ConsoleApp1.Models
 @using Dapper
 @using Dommel
 @using HuntStats.Data
@@ -14,21 +13,87 @@
 @inject IMediator Mediator
 @inject NavigationManager NavigationManager
 @inject AppState AppState
+@inject IJSRuntime JS
 
-<div class="card-container" style="max-width: 1280px;margin:  auto;">
-    <div class="card">
-        <div class="card-body">
-            <h3>Info</h3>
-            
-            Hello, if you like what you see in my application please consider giving it a star on github (:
+<div class="card-container" style="margin:  auto;">
+    <h3>Statistics</h3>
+    <div class="chart-container d-flex flex-xl-row flex-column">
+        <div class="card col position-relative me-xl-2" style="max-height: 500px;">
+            <div class="card-body">
+                <DropdownSelect TValue="int" SearchDisabled="true" ValueChanged="HandleKillChartChange" Value="KillChartAmount" ListItems="ListItems"></DropdownSelect>
+                <div class="killChart">
+                    <canvas @ref="_killChart" id="chart" width="400" height="400">
+
+                    </canvas>
+                </div>
+            </div>
+        </div>
+        <div class="card col position-relative mt-4 mt-xl-0 ms-xl-2" style="max-height: 500px;">
+            <div class="card-body">
+                <DropdownSelect TValue="int" SearchDisabled="true" ValueChanged="HandleMmrChartChange" Value="MmrChartAmount" ListItems="ListItems"></DropdownSelect>
+                <div class="mmrChart">
+                    <canvas @ref="_mmrChart" id="chart" width="400" height="400">
+
+                    </canvas>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+</div> 
 
 
 @code {
+    public bool RefreshChart { get; set; } = false;
 
-    public List<HuntMatch> Matches;
+    private ElementReference _mmrChart;
+    private ElementReference _killChart;
+
+    public int MmrChartAmount { get; set; } = 25;
+    public int KillChartAmount { get; set; } = 25;
+
+    public async Task HandleKillChartChange(int Id)
+    {
+        KillChartAmount = Id;
+        await JS.InvokeAsync<string>("resetChart", _killChart);
+        await FetchKillChart();
+    }
+    
+    public async Task HandleMmrChartChange(int Id)
+    {
+        MmrChartAmount = Id;
+        await JS.InvokeAsync<string>("resetChart", _mmrChart);
+        await FetchMmrChart();
+    }
+
+    public List<DropdownSelect<int>.ListItem> ListItems { get; set; } = new()
+    {
+        new DropdownSelect<int>.ListItem()
+        {
+            Id = 5,
+            Variable = "5"
+        },
+        new DropdownSelect<int>.ListItem()
+        {
+            Id = 10,
+            Variable = "10"
+        },
+        new DropdownSelect<int>.ListItem()
+        {
+            Id = 25,
+            Variable = "25"
+        },
+        new DropdownSelect<int>.ListItem()
+        {
+            Id = 50,
+            Variable = "50"
+        },
+        new DropdownSelect<int>.ListItem()
+        {
+            Id = 100,
+            Variable = "100"
+        }
+    };
+
     public BackgroundWorker worker { get; set; }
     public bool RunBackgroundTask { get; set; } = false;
     public string FilePath { get; set; }
@@ -36,14 +101,90 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await Task.Yield();
         AppState.NewMatchAdded += AppStateOnNewMatchAdded;
-        Matches = await Mediator.Send(new GetMatchCommand());
+        await GetChartInfo();
     }
 
     private async void AppStateOnNewMatchAdded()
     {
-        Matches = await Mediator.Send(new GetMatchCommand());
+        // Matches = await Mediator.Send(new GetMatchCommand());
         await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task GetChartInfo()
+    {
+        await FetchKillChart();
+        await FetchMmrChart();
+    }
+
+    public async Task FetchKillChart()
+    {
+        var killChartInfo = await Mediator.Send(new KillChartQuery(KillChartAmount));
+        await JS.InvokeAsync<string>("createChart", _killChart, new
+        {
+            labels = killChartInfo.Select(x => x.DateTime.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss")),
+            datasets = new List<Dataset>()
+            {
+                new Dataset()
+                {
+                    Label = "Total Kills",
+                    Data = killChartInfo.Select(x => x.Kills).ToList(),
+                    Fill = false,
+                    BorderColor = "rgb(166, 35, 73)",
+                    Tension = 0.4,
+                    PointRadius = 3
+                },
+                new Dataset()
+                {
+                    Label = "Your kills",
+                    Data = killChartInfo.Select(x => x.YourKills).ToList(),
+                    Fill = false,
+                    BorderColor = "rgb(208, 112, 0)",
+                    Tension = 0.4,
+                    PointRadius = 3
+                },
+                new Dataset()
+                {
+                    Label = "Deaths",
+                    Data = killChartInfo.Select(x => x.Deaths).ToList(),
+                    Fill = false,
+                    BorderColor = "rgb(150, 229, 209)",
+                    Tension = 0.4,
+                    PointRadius = 3
+                }
+            } 
+        });
+    }
+
+    public async Task FetchMmrChart()
+    {
+        var mmrChartInfo = await Mediator.Send(new MmrChartQuery(MmrChartAmount));
+        await JS.InvokeAsync<string>("createChart", _mmrChart, new
+        {
+            labels = mmrChartInfo.Select(x => x.DateTime.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss")),
+            datasets = new List<Dataset>()
+            {
+                new Dataset()
+                {
+                    Label = "Mmr",
+                    Data = mmrChartInfo.Select(x => x.Mmr).ToList(),
+                    Fill = false,
+                    BorderColor = "rgb(75, 192, 192)",
+                    Tension = 0.5,
+                    PointRadius = 0
+                },
+                new Dataset()
+                {
+                    Label = "Match MMR",
+                    Data = mmrChartInfo.Select(x => x.TotalMmr).ToList(),
+                    Fill = false,
+                    BorderColor = "rgb(166, 35, 73)",
+                    Tension = 0.5,
+                    PointRadius = 0
+                }
+            } 
+        });
     }
 
     public async Task ToggleCheck()

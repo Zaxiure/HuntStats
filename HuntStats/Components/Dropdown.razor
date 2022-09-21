@@ -12,7 +12,8 @@
             </div>
         }
     }
-    <div @ref="_dropdownElement" class="dropdown shadow @Class @getDropdownClass()">
+
+    <div @ref="_dropdownElement" class="dropdown shadow @(AlternateStyle ? "alternate" : "") @(RemoveMargin ? "no-margin" : "") @getDropdownClass()">
         @{
             if (DropdownContent != null)
             {
@@ -24,13 +25,19 @@
 
 @code {
     [Parameter]
-    public string? Class { get; set; }
-    
-    [Parameter]
     public RenderFragment<string>? DropdownClickable { get; set; }
     
     [Parameter]
     public RenderFragment? DropdownContent { get; set; }
+    
+    [Parameter]
+    public bool RemoveMargin { get; set; }
+    
+    [Parameter]
+    public bool AlternateStyle { get; set; }
+
+    [Parameter]
+    public EventCallback DropdownOpened { get; set; } = new EventCallback();
 
     private ElementReference _clickWrapper;
     private ElementReference _dropdownElement;
@@ -49,19 +56,22 @@
         return returnClass;
     }
     
-    private void toggleDropdown()
+    private async Task toggleDropdown()
     {
         _dropdownOpened = !_dropdownOpened;
-        if(_dropdownOpened) _appstate.OpenedDropdown(_uniqueId);
+        if(_dropdownOpened)
+        {
+            _appstate.OpenedDropdown(_uniqueId);
+            await DropdownOpened.InvokeAsync();
+        };
+        
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await Task.Delay(500);
-            await JS.InvokeAsync<string>("createDropdown", _clickWrapper, _dropdownElement);
-            
+            await JS.InvokeVoidAsync("createDropdown", _clickWrapper, _dropdownElement);
             _stopAnimation = true;
             _initialized = true;
             StateHasChanged();

@@ -7,7 +7,9 @@
 	<base href="/" />
 	<link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
 	<link href="css/app.css" rel="stylesheet" />
-	<link href="HuntStats.styles.css" rel="stylesheet" />
+    <link href="HuntStats.styles.css" rel="stylesheet" />
+	<script src="js/popper.min.js"></script>
+	<script src="js/chart.min.js"></script>
 </head>
 
 <body>
@@ -22,8 +24,44 @@
 		<a class="dismiss">🗙</a>
 	</div>
 	<script>
+		var charts = [];
+		var testobject;
+		
 		window.getWidth = () => {
 			return window.innerWidth
+		}
+
+		window.resetChart = (el) => {
+			var chartToRefresh = charts.filter(x => x.canvas == el)[0];
+			chartToRefresh.destroy();
+			charts.splice(charts.indexOf(chartToRefresh), 1);
+		}
+		
+		window.resetCharts = () => {
+			charts.forEach(x => {
+				x.destroy();
+			})
+			charts = [];
+		}
+		
+		window.createChart = (chartElement, data) => {
+			console.log(data);
+			console.log(chartElement);
+			// var labels = Utils.months({count: 7});
+			charts = [...charts, new Chart(chartElement, {
+				type: "line",
+				data: data,
+				options: {
+					responsive:true,
+					maintainAspectRatio: false,
+					scales: {
+						y: {
+							suggestedMax: 10,
+						}
+					}
+					// suggestedMax: 10
+				}
+			})]
 		}
 
 		window.createDropdown = (clickElement, dropdownElement) => {
@@ -36,7 +74,7 @@
 						altAxis: true,
 						mainAxis: false,
 						tether: false,
-						padding: 15
+						// padding: 15
 					}
 				}],
 				strategy: 'fixed'
@@ -45,6 +83,21 @@
 				dropdown.update();
 			}, 100)
 		}
+	</script>
+
+	<script>
+		window.getWidth = () => {
+			return window.innerWidth
+		}
+
+		// window.createDropdown = (clickElement, dropdownElement) => {
+		// 	let dropdown = Popper.createPopper(clickElement, dropdownElement, {
+		//		
+		// 	})
+		// 	setTimeout(() => {
+		// 		dropdown.update();
+		// 	}, 100)
+		// }
 	</script>
 
 	<script>

@@ -1,0 +1,116 @@
+@using HuntStats.State
+@typeparam TValue
+@inject AppState AppState
+<Dropdown DropdownOpened="FocusSearchInput" AlternateStyle="true" RemoveMargin="true">
+    <DropdownClickable>
+        <input readonly class="form-control" value="@GetInputText()" type="text"/>
+    </DropdownClickable>
+    <DropdownContent>
+        @if (SearchDisabled == null || SearchDisabled == false)
+        {
+            <div class="search-container">
+                <input @ref="_searchInput" placeholder="Search..." type="text" class="form-control" value="@_searchValue" @oninput="SetSearchedList">
+            </div>
+        }
+        <div class="scrollable-container">
+            <ul>
+                @if (searchedList != null)
+                {
+                    @foreach (var item in searchedList)
+                    {
+                        @if (item.Color == null)
+                        {
+                            <li @key="item" @onclick="() => { SelectItem(item); }">
+                                @(item.SecondaryVariable == null ? item.Variable : item.Variable + " - " + item.SecondaryVariable)
+                            </li>
+                        }
+                        else
+                        {
+                            <li @key="item" @onclick="() => { SelectItem(item); }">
+                                <div class="color-circle" style="background-color: #@item.Color"></div>
+                                <span>
+                                    @(item.SecondaryVariable == null ? item.Variable : item.Variable + " - " + item.SecondaryVariable)
+                                </span>
+                            </li>
+                        }
+                    }
+                }
+            </ul>
+        </div>
+    </DropdownContent>
+</Dropdown>
+
+@code {
+    [Parameter]
+    public TValue? Value { get; set; }
+    
+    [Parameter]
+    public EventCallback<TValue> ValueChanged { get; set; }
+    
+    [Parameter]
+    public List<ListItem> ListItems { get; set; }
+    
+    [Parameter]
+    public bool SearchDisabled { get; set; }
+    
+    private ElementReference _searchInput;
+
+    private List<ListItem> searchedList;
+
+    private string? _searchValue;
+
+    public string GetInputText()
+    {
+        if (Value != null)
+        {
+            if (ListItems.FirstOrDefault(x => Nullable.Equals(x.Id, Value)) == null) return "Select...";
+            return ListItems.FirstOrDefault(x => Nullable.Equals(x.Id, Value))!.Variable;
+        }
+
+        return "Select...";
+    }
+
+    public async Task FocusSearchInput()
+    {
+        if (!SearchDisabled)
+        {
+            await Task.Delay(100);
+            await _searchInput.FocusAsync();
+        }
+    }
+
+    public void SetSearchedList(ChangeEventArgs args)
+    {
+        _searchValue = args.Value.ToString();
+        if (string.IsNullOrEmpty(_searchValue))
+        {
+            searchedList = ListItems;
+        }
+        else
+        {
+            searchedList = ListItems.Where(x => x.Variable.ToLower().Contains(_searchValue.ToLower())).ToList();
+        }
+        StateHasChanged();
+    }
+
+    public void SelectItem(ListItem item)
+    {
+        AppState.CloseOpenedDropdown();
+        Value = item.Id;
+        ValueChanged.InvokeAsync(Value);
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        searchedList = ListItems;
+    }
+
+    public class ListItem
+    {
+        public TValue Id { get; set; }
+        public string Variable { get; set; }
+        public string? SecondaryVariable { get; set; }
+        public string? Color { get; set; }
+    }
+}

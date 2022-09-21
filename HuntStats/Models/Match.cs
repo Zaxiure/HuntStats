@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ConsoleApp1.Models;
+namespace HuntStats.Models;
 
 
 [Table("Match")]
@@ -70,4 +70,34 @@ public class Player
     public int BountyPickedUp { get; set; }
     
     public int BountyExtracted { get; set; }
+
+    public int StarRating()
+    {
+        if (Mmr >= 0 && Mmr < 2000)
+        {
+            return 1;
+        }
+
+        if (Mmr >= 2000 && Mmr < 2300)
+        {
+            return 2;
+        }
+
+        if (Mmr >= 2300 && Mmr < 2600)
+        {
+            return 3;
+        }
+
+        if (Mmr >= 2600 && Mmr < 2750)
+        {
+            return 4;
+        }
+
+        if (Mmr >= 2750 && Mmr < 3000)
+        {
+            return 5;
+        }
+
+        return 6;
+    }
 }

@@ -2,7 +2,7 @@
 @using MediatR
 @using HuntStats.Features
 @using HuntStats.Models
-@using ConsoleApp1.Models
+@using HuntStats.Extensions
 @inject IMediator Mediator
 @inject IFolderPicker FolderPicker
 @inject NavigationManager NavigationManager
@@ -16,63 +16,178 @@
             <div class="btn btn-primary" @onclick='() => { NavigationManager.NavigateTo("/match"); }'>Back</div>
         </div>
     </div>
-    <div class="card">
-        @if (HuntMatch != null)
-        {
+    <div class="match-container d-flex flex-xl-row flex-column">
+        <div class="card col me-xl-2 overflow-auto" style="max-height: calc(100vh - 150px)">
             <div class="card-body">
-                <div class="totals">
-                    <div class="kills">
-                        Total kills: @Kills
-                    </div>
-                    <div class="kills">
-                        Your Kills: @YourKills
-                    </div>
-                    <div class="assists">
-                        Kill Assists: @Assists
-                    </div>
-                    <div class="deaths">
-                        Deaths: @Deaths
-                    </div>
-                    @if (EventPoints != null)
+                @* <div class="teams"> *@
+                @*     <div class="d-flex flex-row pt-4 flex-wrap"> *@
+                @*         $1$ @foreach (var team in HuntMatch.Teams) #1# *@
+                @*         $1$ { #1# *@
+                @*         $1$     <div @onclick="() => { Team = team; }" class="btn btn-primary ms-3 mb-3 flex-shrink-0">Team @(HuntMatch.Teams.IndexOf(team)+1)@(team.Players.FirstOrDefault(x => x.ProfileId.ToString() == Settings.PlayerProfileId) != null ? " (Own Team)" : "")</div> #1# *@
+                @*         $1$ } #1# *@
+                @*     </div> *@
+                @* </div> *@
+                <div class="team-container">
+                    @foreach (var team in HuntMatch.Teams)
                     {
-                        <div class="eventpoints">
-                            Event Points: @EventPoints
+                        
+                        <div class="team-title">
+                            Team #@(HuntMatch.Teams.IndexOf(team) + 1)
                         </div>
-                    }
-                </div>
-                <div class="teams w-50">
-                    <div class="d-flex flex-row pt-4 flex-wrap">
-                        @foreach (var team in HuntMatch.Teams)
-                        {
-                            <div @onclick="() => { Team = team; }" class="btn btn-primary ms-3 mb-3 flex-shrink-0">Team @(HuntMatch.Teams.IndexOf(team)+1)@(team.Players.FirstOrDefault(x => x.ProfileId.ToString() == Settings.PlayerProfileId) != null ? " (Own Team)" : "")</div>
-                        }
-                    </div>
-                    <div class="team-container">
-                        <div class="team-title">Team #@(HuntMatch.Teams.IndexOf(Team) + 1)</div>
-                        @foreach (var player in Team.Players)
+                        <small class="d-block" style="padding:5px 15px">
+                            @{
+                                Mmr = Team.Players.Select(x => x.Mmr).Sum() / Team.Players.Count();
+                            }
+                            Team MMR:
+                            @for (int i = 0; i < Mmr.ToStarRating(); i++)
+                            {
+                                <i class="fas fa-star"></i>
+                            }
+                            @for (int i = 0; i < (6 - Mmr.ToStarRating()); i++)
+                            {
+                                <i class="far fa-star"></i>
+                            }
+                            (@Mmr)
+                        </small>
+                        @foreach (var player in team.Players)
                         {
                             <div class="team d-flex flex-row">
-                                <div class="team-player w-25 text-nowrap overflow-hidden">
+                                <div class="team-player text-nowrap overflow-hidden" style="width: 200px;">
                                     @player.Name
                                 </div>
                                 @if (Settings.PlayerProfileId == null || Settings.PlayerProfileId == string.Empty)
                                 {
                                     if (player.ProfileId != "0")
                                     {
-                                        <div @onclick="() => { UpdateProfile(player.ProfileId.ToString()); }" class="btn btn-primary team-player" style="border-radius: 0 !important;border-width: 1px">
+                                        <div @onclick="() => { UpdateProfile(player.ProfileId.ToString()); }" class="btn btn-primary team-player" style="border-radius: 0 !important; border-width: 1px">
                                             This is me!
                                         </div>
                                     }
                                 }
                                 <div class="team-player">
-                                    MMR: @player.Mmr
+                                    @for (int i = 0; i < @player.StarRating(); i++)
+                                    {
+                                        <i class="fas fa-star"></i>
+                                    }
+                                    @for (int i = 0; i < (6 - player.StarRating()); i++)
+                                    {
+                                        <i class="far fa-star"></i>
+                                    }
+                                    (@player.Mmr)
                                 </div>
+                                @for (int i = 0; i < player.DownedByMe; i++)
+                                {
+                                    <Tooltip Text="You downed this hunter.">
+                                        <div class="team-player">
+                                            <i class="fas fa-skull"></i>
+                                        </div>
+                                    </Tooltip>
+                                }
+                                @for (int i = 0; i < player.DownedByTeammate; i++)
+                                {
+                                    <Tooltip Text="Your teammate downed this hunter.">
+                                        <div class="team-player blue-background">
+                                            <i class="fas fa-skull"></i>
+                                        </div>
+                                    </Tooltip>
+                                }
+                                @for (int i = 0; i < player.DownedMe; i++)
+                                {
+                                    <Tooltip Text="This hunter downed you">
+                                        <div class="team-player">
+                                            <i class="fas fa-tombstone"></i>
+                                        </div>
+                                    </Tooltip>
+                                }
+                                @for (int i = 0; i < player.DownedTeammate; i++)
+                                {
+                                    <Tooltip Text="This hunter downed your teammate.">
+                                        <div class="team-player blue-background">
+                                            <i class="fas fa-tombstone"></i>
+                                        </div>
+                                    </Tooltip>
+                                }
+                                @for (int i = 0; i < player.KilledByMe; i++)
+                                {
+                                    <Tooltip Text="Your teammate downed this hunter.">
+                                        <div class="team-player">
+                                            <i class="fas fa-skull" style="color: #ff0000; fill: #ff0000;"></i>
+                                        </div>
+                                    </Tooltip>
+                                }
+                                @for (int i = 0; i < player.KilledByTeammate; i++)
+                                {
+                                    <Tooltip Text="Your teammate killed this hunter.">
+                                        <div class="team-player blue-background">
+                                            <i class="fas fa-skull" style="color: #ff0000; fill: #ff0000;"></i>
+                                        </div>
+                                    </Tooltip>
+                                }
+                                @for (int i = 0; i < player.KilledMe; i++)
+                                {
+                                    <Tooltip Text="This hunter killed you.">
+                                        <div class="team-player">
+                                            <i class="fas fa-tombstone" style="color: #ff0000; fill: #ff0000;"></i>
+                                        </div>
+                                    </Tooltip>
+                                }
+                                @for (int i = 0; i < player.KilledTeammate; i++)
+                                {
+                                    <Tooltip Text="This hunter killed your teammate.">
+    
+                                        <div class="team-player blue-background">
+                                            <i class="fas fa-tombstone" style="color: #ff0000; fill: #ff0000;"></i>
+                                        </div>
+                                    </Tooltip>
+                                }
                             </div>
                         }
-                    </div>
+                    }
                 </div>
             </div>
-        }
+        </div>
+        <div class="card col mt-4 mt-xl-0 ms-xl-2">
+            @if (HuntMatch != null)
+            {
+                <div class="card-body">
+                    <div class="totals">
+                        <div class="kills">
+                            Total kills: @Kills
+                        </div>
+                        <div class="kills">
+                            Your Kills: @YourKills
+                        </div>
+                        <div class="assists">
+                            Kill Assists: @Assists
+                        </div>
+                        <div class="deaths">
+                            Deaths: @Deaths
+                        </div>
+                        @if (EventPoints != null)
+                        {
+                            <div class="eventpoints">
+                                Event Points: @EventPoints
+                            </div>
+                        }
+                        <div class="deaths">
+                            @{
+                                Mmr = HuntMatch.Teams.Select(x => x.Players.Select(x => x.Mmr).Sum() / x.Players.Count()).Sum() / HuntMatch.Teams.Count;
+                            }
+                            Match MMR: 
+                            @for (int i = 0; i < Mmr.ToStarRating(); i++)
+                            {
+                                <i class="fas fa-star"></i>
+                            }
+                            @for (int i = 0; i < (6 - Mmr.ToStarRating()); i++)
+                            {
+                                <i class="far fa-star"></i>
+                            }
+                            (@Mmr)
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
 </div>
 
@@ -87,6 +202,8 @@
     public Models.Settings Settings { get; set; }
 
     public List<Accolade> Accolades { get; set; }
+
+    public int Mmr { get; set; }
 
     public int Kills { get; set; }
 

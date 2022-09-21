@@ -24,6 +24,7 @@
     border-right: 1px solid #343740;
   }
   
+  
 }
 
 .btn-primary:disabled {
@@ -36,6 +37,10 @@
   font-weight: bolder;
   font-size: 24px;
   //border-bottom: 1px solid #343740;
+}
+
+.team-player.blue-background {
+  background-color: rgba(13, 202, 240, 0.2) !important;
 }
 
 .totals {

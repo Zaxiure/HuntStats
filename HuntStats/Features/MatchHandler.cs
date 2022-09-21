@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using ConsoleApp1.Models;
 using Dommel;
 using HuntStats.Data;
 using HuntStats.Models;
@@ -82,7 +81,7 @@ public class GetAccoladesByMatchIdCommandHandler : IRequestHandler<GetAccoladesB
 
 public class GetMatchCommand : IRequest<List<HuntMatch>>
 {
-    
+    public OrderType OrderType { get; set; } = OrderType.Descending;
 }
 
 public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, List<HuntMatch>>
@@ -122,7 +121,9 @@ public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, List<Hunt
 
             return huntMatch;
         }).Select(x => x.Result);
-
-        return mappedHuntMatch.ToList();
+        
+        if(request.OrderType == OrderType.Descending) return mappedHuntMatch.OrderByDescending(x => x.DateTime).ToList();
+        if(request.OrderType == OrderType.Ascending) return mappedHuntMatch.OrderBy(x => x.DateTime).ToList();
+        return null;
     }
 }
