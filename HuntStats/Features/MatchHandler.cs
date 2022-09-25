@@ -1,11 +1,48 @@
 ﻿using System.Text.RegularExpressions;
+using Dapper;
 using Dommel;
 using HuntStats.Data;
 using HuntStats.Models;
+using HuntStats.State;
 using MediatR;
 using Newtonsoft.Json;
 
 namespace HuntStats.Features;
+
+public class RemoveMatchByIdCommand : IRequest<GeneralStatus>
+{
+    public RemoveMatchByIdCommand(int matchId)
+    {
+        MatchId = matchId;
+    }
+
+    public int MatchId { get; set; }
+}
+
+public class RemoveMatchByIdCommandHandler : IRequestHandler<RemoveMatchByIdCommand, GeneralStatus>
+{
+    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IMediator _mediator;
+    private readonly AppState _appState;
+
+    public RemoveMatchByIdCommandHandler(IDbConnectionFactory connectionFactory, IMediator mediator, AppState appState)
+    {
+        _connectionFactory = connectionFactory;
+        _mediator = mediator;
+        _appState = appState;
+    }
+
+    public async Task<GeneralStatus> Handle(RemoveMatchByIdCommand request, CancellationToken cancellationToken)
+    {
+        using var con = await _connectionFactory.GetOpenConnectionAsync();
+        await con.QueryAsync("DELETE FROM Match WHERE Id = @MatchId", new { MatchId = request.MatchId });
+        await con.QueryAsync("DELETE FROM Entries WHERE MatchId = @MatchId", new { MatchId = request.MatchId });
+        await con.QueryAsync("DELETE FROM Accolades WHERE MatchId = @MatchId", new { MatchId = request.MatchId });
+        await con.QueryAsync("DELETE FROM Teams WHERE MatchId = @MatchId", new { MatchId = request.MatchId });
+        _appState.MatchAdded();
+        return GeneralStatus.Succes;
+    }
+}
 
 public class GetMatchbyIdCommand : IRequest<HuntMatch>
 {

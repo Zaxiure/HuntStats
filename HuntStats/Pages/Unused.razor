@@ -1,0 +1,30 @@
+﻿@page "/test"
+@using System.Diagnostics
+@using System.ComponentModel
+@using Dapper
+@using Dommel
+@using HuntStats.Data
+@using HuntStats.Features
+@using HuntStats.Models
+@using HuntStats.State
+@using MediatR
+@inject IFolderPicker _folderPicker
+@inject IDbConnectionFactory _connectionFactory;
+@inject IMediator Mediator
+@inject NavigationManager NavigationManager
+@inject AppState AppState
+
+<div class="card-container" style="max-width: 1280px;margin:  auto;">
+    <div class="card">
+        <div class="card-body">
+            <h3>Info</h3>
+            
+            Hello, if you like what you see in my application please consider giving it a star on github (:
+        </div>
+    </div>
+</div>
+
+
+@code {
+    
+}
