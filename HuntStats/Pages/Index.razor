@@ -160,6 +160,11 @@
     public async Task FetchMmrChart()
     {
         var mmrChartInfo = await Mediator.Send(new MmrChartQuery(MmrChartAmount));
+        // var mmrMax = mmrChartInfo.Select(x => x.Mmr).Max();
+        // var mmrMin = mmrChartInfo.Select(x => x.Mmr).Min();
+        // var totalMmrMax = mmrChartInfo.Select(x => x.TotalMmr).Max();
+        // var totalMmrMin = mmrChartInfo.Select(x => x.TotalMmr).Min();
+        // Math.Abs()
         await JS.InvokeAsync<string>("createChart", _mmrChart, new
         {
             labels = mmrChartInfo.Select(x => x.DateTime.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss")),

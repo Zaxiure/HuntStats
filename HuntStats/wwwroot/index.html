@@ -10,6 +10,7 @@
     <link href="HuntStats.styles.css" rel="stylesheet" />
 	<script src="js/popper.min.js"></script>
 	<script src="js/chart.min.js"></script>
+<!--	<script src="js/chartjs-plugin-annotation.min.js"></script>-->
 </head>
 
 <body>
@@ -54,6 +55,23 @@
 				options: {
 					responsive:true,
 					maintainAspectRatio: false,
+					// plugins: {
+					// 	annotation: {
+					// 		annotations: {
+					// 			line1: {
+					// 				type: 'line',
+					// 				yMin: 2000,
+					// 				yMax: 2000,
+					// 				label: {
+					// 					display: true,
+					// 					content: 'Test'
+					// 				},
+					// 				borderColor: 'rgb(255, 99, 132)',
+					// 				borderWidth: 2,
+					// 			}
+					// 		}
+					// 	}
+					// },
 					scales: {
 						y: {
 							suggestedMax: 10,

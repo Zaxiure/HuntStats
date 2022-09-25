@@ -53,14 +53,28 @@
                                     }
                                 </td>
                             }
-                            <td>
-                                <div @onclick='() => { NavigationManager.NavigateTo("/match/" + match.Id); }' class="btn btn-primary">
-                                    <i class="fal fa-eye"></i>
-                                </div>
-                                <div class="btn btn-primary">
-                                    <i class="fal fa-trash"></i>
-                                </div>
-                            </td>
+                            @if (DeleteMatches.Contains(match))
+                            {
+                                <td>
+                                    <div class="btn btn-primary" @onclick="async () => { await DeleteMatch(match); }" color="">
+                                        <i class="fal fa-check" style="color: #C6EBC5;"></i>
+                                    </div>
+                                    <div @onclick="() => { RemoveFromDelete(match); }" class="btn btn-primary" color="">
+                                        <i class="fal fa-times" style="color: #F96666;"></i>
+                                    </div>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <div @onclick='() => { NavigationManager.NavigateTo("/match/" + match.Id); }' class="btn btn-primary">
+                                        <i class="fal fa-eye"></i>
+                                    </div>
+                                    <div @onclick="() => { AddToDelete(match); }" class="btn btn-primary">
+                                        <i class="fal fa-trash"></i>
+                                    </div>
+                                </td>
+                            }
                         </tr>
                     }
                     </tbody>
@@ -74,6 +88,8 @@
 @code {
 
     public OrderType OrderType { get; set; } = OrderType.Descending;
+
+    public List<HuntMatch> DeleteMatches { get; set; } = new List<HuntMatch>();
 
     public List<DropdownSelect<OrderType>.ListItem> ListItems { get; set; } = new()
     {
@@ -94,6 +110,21 @@
     public string FilePath { get; set; }
     public string Path { get; set; } = "";
     public Models.Settings Settings { get; set; }
+
+    private async Task DeleteMatch(HuntMatch match)
+    {
+        await Mediator.Send(new RemoveMatchByIdCommand(match.Id));
+    }
+
+    private void AddToDelete(HuntMatch match)
+    {
+        DeleteMatches.Add(match);
+    }
+
+    private void RemoveFromDelete(HuntMatch match)
+    {
+        DeleteMatches.Remove(match);
+    }
 
     protected override async Task OnInitializedAsync()
     {
