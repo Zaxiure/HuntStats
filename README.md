@@ -1,5 +1,5 @@
 [![Build Passing](https://img.shields.io/github/workflow/status/zaxiure/huntstats/.NET?style=for-the-badge)](https://github.com/Zaxiure/HuntStats/blob/master/.github/workflows/dotnet.yml)
-[![HuntStats Current Version](https://img.shields.io/github/v/release/zaxiure/huntstats?style=for-the-badge)](https://github.com/Zaxiure/HuntStats/releases)
+[![HuntStats Current Version](https://img.shields.io/github/v/release/zaxiure/huntstats?style=for-the-badge)](https://github.com/Zaxiure/HuntStats/releases/latest)
 [![Github Downloads](https://img.shields.io/github/downloads/zaxiure/huntstats/total?style=for-the-badge)](https://github.com/Zaxiure/HuntStats/releases)
 # HuntStats
 
