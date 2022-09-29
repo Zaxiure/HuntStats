@@ -18,23 +18,24 @@
     <h3>Matches</h3>
     <div class="card">
         <div class="card-body">
+            @* <Pagination></Pagination> *@
             <DropdownSelect TValue="OrderType" ValueChanged="HandleOrderTypeChange" SearchDisabled="true" Value="OrderType" ListItems="ListItems"></DropdownSelect>
             <div class="table-wrapper mt-2">
                 <table class="table table-dark data-table" style="margin-bottom: 0 !important;">
                     <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Datssse</th>
-                            <th scope="col">Teams</th>
-                            <th scope="col">Total Players</th>
-                            @if (Settings.PlayerProfileId != null || Settings.PlayerProfileId != string.Empty || Settings.PlayerProfileId != "0")
-                            {
-                                <th>
-                                    MMR
-                                </th>
-                            }
-                            <th>Actions</th>
-                        </tr>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Datssse</th>
+                        <th scope="col">Teams</th>
+                        <th scope="col">Total Players</th>
+                        @if (Settings.PlayerProfileId != null || Settings.PlayerProfileId != string.Empty || Settings.PlayerProfileId != "0")
+                        {
+                            <th>
+                                MMR
+                            </th>
+                        }
+                        <th>Actions</th>
+                    </tr>
                     </thead>
                     <tbody>
                     @foreach (var match in Matches)
