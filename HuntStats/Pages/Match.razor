@@ -36,7 +36,7 @@
                         </div>
                         <small class="d-block" style="padding:5px 15px">
                             @{
-                                Mmr = team.Players.Select(x => x.Mmr).Sum() / Team.Players.Count();
+                                Mmr = team.Players.Select(x => x.Mmr).Sum() / team.Players.Count();
                             }
                             Team MMR:
                             @for (int i = 0; i < Mmr.ToStarRating(); i++)
