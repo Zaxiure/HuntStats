@@ -1,82 +1,138 @@
-﻿<nav>
-  <ul class="pagination">
-    <li class="page-item disabled">
-      <a class="page-link" href="#" tabindex="-1">
-        <i class="far fa-chevron-left"></i>
-      </a>
-    </li>
-    
-    
-    <li class="page-item"><a class="page-link" href="#">1</a></li>
-    <li class="page-item active">
-      <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
-    </li>
-    <li class="page-item"><a class="page-link" href="#">3</a></li>
-    
-    
+﻿<ul class="pagination">
     <li class="page-item">
-      <a class="page-link" href="#">
-        <i class="far fa-chevron-right"></i>
-      </a>
+        <a class="page-link" @onclick="PrevPage">
+            <i class="far fa-chevron-left"></i>
+        </a>
     </li>
-  </ul>
-</nav>
+
+
+    @foreach (var page in GeneratedPagination)
+    {
+        if (page != -1)
+        {
+            if (CurrentPage != page)
+            {
+                <li class="page-item">
+                    <a class="page-link" @onclick="() => { SetPage(page); }">@(page)</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link active">@(page)</a>
+                </li>
+            }
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link" disabled>...</a>
+            </li>
+        }
+    }
+
+
+    <li class="page-item">
+        <a class="page-link" @onclick="NextPage">
+            <i class="far fa-chevron-right"></i>
+        </a>
+    </li>
+</ul>
+
 @code {
 
-  [Parameter]
-  public int TotalPages { get; set; } = 10;
+    [Parameter]
+    public EventCallback<int> OnPageChange { get; set; }
 
-  [Parameter]
-  public int Padding { get; set; } = 2;
+    [Parameter]
+    public int TotalPages { get; set; } = 10;
 
-  [Parameter]
-  public int PaddingInside { get; set; } = 2;
+    [Parameter]
+    public int Padding { get; set; } = 2;
 
-  [Parameter]
-  public int CurrentPage { get; set; } = 1;
+    [Parameter]
+    public int PaddingInside { get; set; } = 2;
 
-  protected override async Task OnInitializedAsync()
-  {
-    CalculatePagination();
-  }
+    [Parameter]
+    public int CurrentPage { get; set; } = 1;
 
-  private void CalculatePagination()
-  {
-    var pagination = new List<String>();
+    private IEnumerable<int> GeneratedPagination { get; set; }
 
-    for (int i = 1; i <= Padding; i++)
+    protected override async Task OnParametersSetAsync()
     {
-      pagination.Add(i.ToString());
+        await base.OnParametersSetAsync();
+        GeneratedPagination = GeneratePagination();
     }
 
-    if (CurrentPage > Padding+1)
+    private void SetPage(int page)
     {
-      pagination.Add("...");
+        CurrentPage = page;
+        GeneratedPagination = GeneratePagination();
+        OnPageChange.InvokeAsync(CurrentPage);
     }
 
-    for (int i = CurrentPage; i < (CurrentPage + PaddingInside + Padding); i++)
+    private void NextPage()
     {
-      if (!(CurrentPage < Padding))
-      {
-        pagination.Add(i.ToString());
-      }
-    }
-    
-    var endPagination = new List<String>();
-    
-    for (int i = TotalPages; i > (TotalPages - Padding); i--)
-    {
-      endPagination.Add(i.ToString());
+        if (CurrentPage != TotalPages)
+        {
+            CurrentPage += 1;
+            GeneratedPagination = GeneratePagination();
+            OnPageChange.InvokeAsync(CurrentPage);
+        }
     }
 
-    if (CurrentPage < (TotalPages - Padding - 1))
+    private void PrevPage()
     {
-      endPagination.Add("...");
+        if (CurrentPage != 1)
+        {
+            CurrentPage -= 1;
+            GeneratedPagination = GeneratePagination();
+            OnPageChange.InvokeAsync(CurrentPage);
+        }
     }
-    
-    endPagination.Reverse();
-    pagination.AddRange(endPagination);
 
-    var test = "yeet";
-  }
+    private IEnumerable<int> GeneratePagination()
+    {
+        if (TotalPages <= 4 || TotalPages <= 2 * Padding + PaddingInside + 2)
+            return Enumerable.Range(1, TotalPages).ToArray();
+
+        var length = 2 * Padding + PaddingInside + 2;
+        var pages = new int[length];
+
+        for (var i = 0; i < Padding; i++)
+        {
+            pages[i] = i + 1;
+        }
+
+        for (var i = 0; i < Padding; i++)
+        {
+            pages[length - i - 1] = TotalPages - i;
+        }
+
+        var startValue = 0;
+        if (CurrentPage <= Padding + PaddingInside / 2 + 1)
+            startValue = Padding + 2;
+        else if (CurrentPage >= TotalPages - Padding - PaddingInside / 2)
+            startValue = TotalPages - Padding - PaddingInside;
+        else
+            startValue = CurrentPage - PaddingInside / 2;
+
+        for (var i = 0; i < PaddingInside; i++)
+        {
+            pages[Padding + 1 + i] = startValue + i;
+        }
+
+        pages[Padding] = (Padding + PaddingInside / 2 + 1 < CurrentPage) ? -1 : Padding + 1;
+
+        pages[length - Padding - 1] = (TotalPages - Padding - PaddingInside / 2 > CurrentPage) ? -1 : TotalPages - Padding;
+
+        for (var i = 0; i < length - 2; i++)
+        {
+            if (pages[i] + 2 == pages[i + 2])
+                pages[i + 1] = pages[i] + 1;
+        }
+
+        return pages;
+    }
+
 }

@@ -17,15 +17,14 @@
 <div class="card-container" style="max-width: 1280px;margin:  auto;">
     <h3>Matches</h3>
     <div class="card">
-        <div class="card-body">
-            @* <Pagination></Pagination> *@
+        <div class="card-body" style="position: relative">
             <DropdownSelect TValue="OrderType" ValueChanged="HandleOrderTypeChange" SearchDisabled="true" Value="OrderType" ListItems="ListItems"></DropdownSelect>
             <div class="table-wrapper mt-2">
                 <table class="table table-dark data-table" style="margin-bottom: 0 !important;">
                     <thead>
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Datssse</th>
+                        <th scope="col">Date</th>
                         <th scope="col">Teams</th>
                         <th scope="col">Total Players</th>
                         @if (Settings.PlayerProfileId != null || Settings.PlayerProfileId != string.Empty || Settings.PlayerProfileId != "0")
@@ -38,7 +37,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach (var match in Matches)
+                    @foreach (var match in MatchView.Matches)
                     {
                         <tr>
                             <th scope="row">@match.Id</th>
@@ -81,6 +80,12 @@
                     </tbody>
                 </table>
             </div>
+            <div class="dropdown-wrapper" style="position: absolute;right: 15px;bottom: 15px;width: 200px;">
+                <DropdownSelect TValue="int" ValueChanged="HandlePageSizeChange" SearchDisabled="true" Value="PageSize" ListItems="ListItemsPageSize"></DropdownSelect>
+            </div>
+            <div class="pagination-wrapper mt-3" style="width: max-content; margin: auto;">
+                <Pagination CurrentPage="Page" TotalPages="Convert.ToInt32(Math.Ceiling((Double)MatchView.Total / PageSize))" OnPageChange="PageChanged"></Pagination>
+            </div>
         </div>
     </div>
 </div>
@@ -89,6 +94,10 @@
 @code {
 
     public OrderType OrderType { get; set; } = OrderType.Descending;
+
+    public int Page { get; set; } = 1;
+
+    public int PageSize { get; set; } = 10;
 
     public List<HuntMatch> DeleteMatches { get; set; } = new List<HuntMatch>();
 
@@ -105,7 +114,30 @@
             Variable = "Descending"
         }
     };
-    public List<HuntMatch> Matches;
+    public List<DropdownSelect<int>.ListItem> ListItemsPageSize { get; set; } = new()
+    {
+        new()
+        {
+            Id = 10,
+            Variable = "10"
+        },
+        new()
+        {
+            Id = 25,
+            Variable = "25"
+        },
+        new()
+        {
+            Id = 50,
+            Variable = "50"
+        },
+        new()
+        {
+            Id = 100,
+            Variable = "100"
+        },
+    };
+    public MatchView MatchView;
     public BackgroundWorker worker { get; set; }
     public bool RunBackgroundTask { get; set; } = false;
     public string FilePath { get; set; }
@@ -130,24 +162,49 @@
     protected override async Task OnInitializedAsync()
     {
         AppState.NewMatchAdded += AppStateOnNewMatchAdded;
-        Matches = await Mediator.Send(new GetMatchCommand());
+        MatchView = await Mediator.Send(new GetMatchCommand()
+            {
+                OrderType = OrderType,
+                Page = Page,
+                PageSize = PageSize
+            });
         Settings = await Mediator.Send(new GetSettingsCommand());
     }
 
     private async Task HandleOrderTypeChange(OrderType value)
     {
         OrderType = value;
-        Matches = await Mediator.Send(new GetMatchCommand()
+        MatchView = await Mediator.Send(new GetMatchCommand()
         {
-            OrderType = OrderType
+            OrderType = OrderType,
+            Page = Page,
+            PageSize = PageSize
         });
     }
+    
+    private async Task HandlePageSizeChange(int value)
+    {
+        PageSize = value;
+        Page = 1;
+        MatchView = await Mediator.Send(new GetMatchCommand()
+        {
+            OrderType = OrderType,
+            Page = Page,
+            PageSize = PageSize
+        });
+        StateHasChanged();
+    }
+    
+    
+    
 
     private async void AppStateOnNewMatchAdded()
     {
-        Matches = await Mediator.Send(new GetMatchCommand()
+        MatchView = await Mediator.Send(new GetMatchCommand()
         {
-            OrderType = OrderType
+            OrderType = OrderType,
+            Page = Page,
+            PageSize = PageSize
         });
         await InvokeAsync(StateHasChanged);
     }
@@ -167,4 +224,17 @@
         }
         StateHasChanged();
     }
+
+    private async Task PageChanged(int newPage)
+    {
+        Page = newPage;
+        MatchView = await Mediator.Send(new GetMatchCommand()
+        {
+            OrderType = OrderType,
+            Page = Page,
+            PageSize = PageSize
+        });
+        await InvokeAsync(StateHasChanged);
+    }
+
 }
