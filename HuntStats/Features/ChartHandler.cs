@@ -26,7 +26,7 @@ public class MmrChartQueryHandler : IRequestHandler<MmrChartQuery, List<ChartInf
 
     public async Task<List<ChartInfo>> Handle(MmrChartQuery request, CancellationToken cancellationToken)
     {
-        var Matches = await _mediator.Send(new GetMatchCommand());
+        var Matches = await _mediator.Send(new GetAllMatchCommand());
         var Settings = await _mediator.Send(new GetSettingsCommand());
         Matches = Matches.OrderByDescending(x => x.DateTime).Take(request.Amount).ToList();
         
@@ -72,7 +72,7 @@ public class KillChartQueryHandler : IRequestHandler<KillChartQuery, List<KillCh
 
     public async Task<List<KillChartInfo>> Handle(KillChartQuery request, CancellationToken cancellationToken)
     {
-        var Matches = await _mediator.Send(new GetMatchCommand());
+        var Matches = await _mediator.Send(new GetAllMatchCommand());
         var Settings = await _mediator.Send(new GetSettingsCommand());
         Matches = Matches.OrderByDescending(x => x.DateTime).Take(request.Amount).ToList();
         

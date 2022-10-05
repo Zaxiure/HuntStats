@@ -116,12 +116,22 @@ public class GetAccoladesByMatchIdCommandHandler : IRequestHandler<GetAccoladesB
     }
 }
 
-public class GetMatchCommand : IRequest<List<HuntMatch>>
+
+
+public class GetMatchCommand : IRequest<MatchView>
 {
     public OrderType OrderType { get; set; } = OrderType.Descending;
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
 }
 
-public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, List<HuntMatch>>
+public class MatchView
+{
+    public int Total { get; set; }
+    public List<HuntMatch> Matches { get; set; }
+}
+
+public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, MatchView>
 {
     private readonly IDbConnectionFactory _connectionFactory;
     
@@ -130,7 +140,7 @@ public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, List<Hunt
         _connectionFactory = connectionFactory;
     }
     
-    public async Task<List<HuntMatch>> Handle(GetMatchCommand request, CancellationToken cancellationToken)
+    public async Task<MatchView> Handle(GetMatchCommand request, CancellationToken cancellationToken)
     {
         using var con = await _connectionFactory.GetOpenConnectionAsync();
 
@@ -159,8 +169,66 @@ public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, List<Hunt
             return huntMatch;
         }).Select(x => x.Result);
         
-        if(request.OrderType == OrderType.Descending) return mappedHuntMatch.OrderByDescending(x => x.DateTime).ToList();
-        if(request.OrderType == OrderType.Ascending) return mappedHuntMatch.OrderBy(x => x.DateTime).ToList();
+        if(request.OrderType == OrderType.Descending) return new MatchView()
+        {
+            Total = mappedHuntMatch.Count(),
+            Matches = mappedHuntMatch.OrderByDescending(x => x.DateTime).Skip((request.Page-1) * request.PageSize).Take(request.PageSize).ToList()
+        };
+        if(request.OrderType == OrderType.Ascending) return new MatchView()
+        {
+            Total = mappedHuntMatch.Count(),
+            Matches = mappedHuntMatch.OrderBy(x => x.DateTime).Skip((request.Page-1) * request.PageSize).Take(request.PageSize).ToList()
+        };
+        return null;
+    }
+}
+
+public class GetAllMatchCommand : IRequest<List<HuntMatch>>
+{
+    public OrderType OrderType { get; set; } = OrderType.Descending;
+}
+public class GetAllMatchCommandHandler : IRequestHandler<GetAllMatchCommand, List<HuntMatch>>
+{
+    private readonly IDbConnectionFactory _connectionFactory;
+    
+    public GetAllMatchCommandHandler(IDbConnectionFactory connectionFactory)
+    {
+        _connectionFactory = connectionFactory;
+    }
+    
+    public async Task<List<HuntMatch>> Handle(GetAllMatchCommand request, CancellationToken cancellationToken)
+    {
+        using var con = await _connectionFactory.GetOpenConnectionAsync();
+
+        var matches = await con.GetAllAsync<HuntMatchTable>();
+
+        var mappedHuntMatch = matches.Select(async x =>
+        {
+            var teams = await con.SelectAsync<TeamTable>(j => j.MatchId == x.Id);
+            var huntMatch = new HuntMatch()
+            {
+                Id = x.Id,
+                DateTime = x.DateTime,
+                Teams = teams.Select(team => new Team()
+                {
+                    Id = team.Id,
+                    Mmr = team.Mmr,
+                    Players = JsonConvert.DeserializeObject<List<Player>>(team.Players)
+                }).ToList()
+            };
+            huntMatch.TotalKills = huntMatch.Teams.Select(x => x.Players.Select(x => x.KilledByMe).Sum()).Sum();
+            huntMatch.TotalKillsWithTeammate = huntMatch.TotalKills +
+                                               huntMatch.Teams.Select(x =>
+                                                   x.Players.Select(x => x.KilledByTeammate).Sum()).Sum();
+            huntMatch.TotalDeaths = huntMatch.Teams.Select(x => x.Players.Select(x => x.KilledByMe).Sum()).Sum();
+
+            return huntMatch;
+        }).Select(x => x.Result);
+
+        if (request.OrderType == OrderType.Descending)
+            return mappedHuntMatch.OrderByDescending(x => x.DateTime).ToList();
+        if (request.OrderType == OrderType.Ascending)
+            return mappedHuntMatch.OrderBy(x => x.DateTime).ToList();
         return null;
     }
 }

@@ -15,6 +15,22 @@ body.no-anim * {
   animation-delay: 0s !important;
 }
 
+.pagination {
+  display: inline-block;
+  margin-bottom: 0;
+}
+.pagination li {
+  display: inline-block;
+}
+.pagination .page-link, .pagination .page-link:first-child, .pagination .page-link:last-child {
+  background-color: #1e2026 !important;
+  border: unset;
+  margin: 0px 15px;
+  color: #fff;
+  padding: 5px 15px;
+  border-radius: 10px;
+}
+
 @keyframes shadowIn {
   0% {
     opacity: 0;
