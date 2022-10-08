@@ -6,7 +6,6 @@ using HuntStats.Models;
 using HuntStats.State;
 using MediatR;
 using Newtonsoft.Json;
-using Entry = HuntStats.Models.Entry;
 
 namespace HuntStats.Features;
 
@@ -90,60 +89,6 @@ public class GetMatchbyIdCommandHandler : IRequestHandler<GetMatchbyIdCommand, H
         return mappedHuntMatch.FirstOrDefault();
     }
 }
-
-public class GetAccoladesByMatchIdCommand : IRequest<List<Accolade>> {
-
-    public GetAccoladesByMatchIdCommand(int matchId)
-    {
-        MatchId = matchId;
-    }
-
-    public int MatchId { get; set; }
-}
-
-public class GetAccoladesByMatchIdCommandHandler : IRequestHandler<GetAccoladesByMatchIdCommand, List<Accolade>>
-{
-    private readonly IDbConnectionFactory _connectionFactory;
-
-    public GetAccoladesByMatchIdCommandHandler(IDbConnectionFactory connectionFactory)
-    {
-        _connectionFactory = connectionFactory;
-    }
-    public async Task<List<Accolade>> Handle(GetAccoladesByMatchIdCommand request, CancellationToken cancellationToken)
-    {
-        var con = await _connectionFactory.GetOpenConnectionAsync();
-        var accolades = await con.SelectAsync<Accolade>(x => x.MatchId == request.MatchId);
-        return accolades.ToList();
-    }
-}
-
-public class GetEntriesByMatchIdCommand : IRequest<List<Entry>> {
-
-    public GetEntriesByMatchIdCommand(int matchId)
-    {
-        MatchId = matchId;
-    }
-
-    public int MatchId { get; set; }
-}
-
-public class GetEntriesByMatchIdCommandHandler : IRequestHandler<GetEntriesByMatchIdCommand, List<Entry>>
-{
-    private readonly IDbConnectionFactory _connectionFactory;
-
-    public GetEntriesByMatchIdCommandHandler(IDbConnectionFactory connectionFactory)
-    {
-        _connectionFactory = connectionFactory;
-    }
-    public async Task<List<Entry>> Handle(GetEntriesByMatchIdCommand request, CancellationToken cancellationToken)
-    {
-        var con = await _connectionFactory.GetOpenConnectionAsync();
-        var entries = await con.SelectAsync<Entry>(x => x.MatchId == request.MatchId);
-        return entries.ToList();
-    }
-}
-
-
 
 public class GetMatchCommand : IRequest<MatchView>
 {
