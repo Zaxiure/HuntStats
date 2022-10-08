@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HuntStats.Models;
 
 [Table("Entries")]
-public class Entry
+public class HuntEntry
 {
     public int Id { get; set; }
     public int Amount { get; set; }

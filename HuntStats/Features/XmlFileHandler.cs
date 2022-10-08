@@ -8,7 +8,6 @@ using HuntStats.State;
 using MediatR;
 using Newtonsoft.Json;
 using Serilog;
-using Entry = HuntStats.Models.Entry;
 
 namespace HuntStats.Features;
 
@@ -217,12 +216,12 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
                 var numberOfEntries = Convert.ToInt32(attributes.FirstOrDefault(x => x.Key == "MissionBagNumEntries").Value);
                 var numberOfAccolades = Convert.ToInt32(attributes.FirstOrDefault(x => x.Key == "MissionBagNumAccolades").Value);
     
-                var entries = new List<Entry>();
+                var entries = new List<HuntEntry>();
                 var accolades = new List<Accolade>();
     
                 for (int i = 0; i < numberOfEntries; i++)
                 {
-                    entries.Add(new Entry()
+                    entries.Add(new HuntEntry()
                     {
                         Amount = Convert.ToInt32(attributes["MissionBagEntry_" + i + "_amount"]),
                         Category = attributes["MissionBagEntry_" + i + "_category"],
