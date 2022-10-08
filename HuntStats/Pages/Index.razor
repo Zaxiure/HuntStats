@@ -24,7 +24,7 @@
                 <div class="killChart" style="height: 400px !important;">
                     <canvas @ref="_killChart" id="chart" width="400" height="400">
 
-                    </canvas>
+                    </canvas >
                 </div>
                 <div class="d-flex flex-row justify-content-between mt-2">
                     <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
@@ -32,6 +32,12 @@
                     </div>
                     <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
                         Your kills: @TotalYourKills
+                    </div>
+                    <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+                        Assists: @TotalAssists
+                    </div>
+                    <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+                        K/D: @(((double)TotalYourKills / TotalDeaths).ToString("#.##"))
                     </div>
                     <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
                         Deaths: @TotalDeaths
@@ -50,6 +56,28 @@
             </div>
         </div>
     </div>
+    <div class="chart-container d-flex flex-xl-row flex-column mt-3">
+        <div class="card col position-relative me-xl-2" style="max-height: 750px;">
+            <div class="card-body">
+                <DropdownSelect TValue="int" SearchDisabled="true" ValueChanged="HandleMoneyChartChange" Value="MoneyChartAmount" ListItems="ListItems"></DropdownSelect>
+                <div class="moneyChart">
+                    <canvas @ref="_moneyChart" id="chart" width="400" height="400">
+
+                    </canvas>
+                </div>
+            </div>
+        </div>
+        <div class="card col position-relative mt-4 mt-xl-0 ms-xl-2" style="max-height: 500px;">
+            <div class="card-body">
+                <DropdownSelect TValue="int" SearchDisabled="true" ValueChanged="HandleXpChartChange" Value="XpChartAmount" ListItems="ListItems"></DropdownSelect>
+                <div class="moneyChart">
+                    <canvas @ref="_xpChart" id="chart" width="400" height="400">
+
+                    </canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 </div> 
 
 
@@ -58,12 +86,17 @@
 
     private ElementReference _mmrChart;
     private ElementReference _killChart;
+    private ElementReference _moneyChart;
+    private ElementReference _xpChart;
 
     public int MmrChartAmount { get; set; } = 25;
+    public int MoneyChartAmount { get; set; } = 25;
     public int KillChartAmount { get; set; } = 25;
+    public int XpChartAmount { get; set; } = 25;
     public int TotalKills { get; set; }
     public int TotalYourKills { get; set; }
     public int TotalDeaths { get; set; }
+    public int TotalAssists { get; set; }
 
     public async Task HandleKillChartChange(int Id)
     {
@@ -77,6 +110,20 @@
         MmrChartAmount = Id;
         await JS.InvokeAsync<string>("resetChart", _mmrChart);
         await FetchMmrChart();
+    }
+    
+    public async Task HandleMoneyChartChange(int Id)
+    {
+        MoneyChartAmount = Id;
+        await JS.InvokeAsync<string>("resetChart", _moneyChart);
+        await FetchMoneyChart();
+    }
+
+    public async Task HandleXpChartChange(int Id)
+    {
+        XpChartAmount = Id;
+        await JS.InvokeAsync<string>("resetChart", _xpChart);
+        await FetchXpChart();
     }
 
     public List<DropdownSelect<int>.ListItem> ListItems { get; set; } = new()
@@ -122,7 +169,11 @@
 
     private async void AppStateOnNewMatchAdded()
     {
-        // Matches = await Mediator.Send(new GetMatchCommand());
+        await HandleKillChartChange(KillChartAmount);
+        await HandleMmrChartChange(MmrChartAmount);
+        await HandleMoneyChartChange(MoneyChartAmount);
+        await HandleXpChartChange(XpChartAmount);
+        StateHasChanged();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -130,6 +181,8 @@
     {
         await FetchKillChart();
         await FetchMmrChart();
+        await FetchMoneyChart();
+        await FetchXpChart();
     }
 
     public async Task FetchKillChart()
@@ -138,6 +191,7 @@
         TotalKills = killChartInfo.Select(x => x.Kills).Sum();
         TotalYourKills = killChartInfo.Select(x => x.YourKills).Sum();
         TotalDeaths = killChartInfo.Select(x => x.Deaths).Sum();
+        TotalAssists = killChartInfo.Select(x => x.Assists).Sum();
         await JS.InvokeAsync<string>("createChart", _killChart, new
         {
             labels = killChartInfo.Select(x => x.DateTime.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss")),
@@ -167,6 +221,15 @@
                     Data = killChartInfo.Select(x => x.Deaths).ToList(),
                     Fill = false,
                     BorderColor = "rgb(150, 229, 209)",
+                    Tension = 0.4,
+                    PointRadius = 3
+                },
+                new Dataset()
+                {
+                    Label = "Assists",
+                    Data = killChartInfo.Select(x => x.Assists).ToList(),
+                    Fill = false,
+                    BorderColor = "rgb(89, 206, 143)",
                     Tension = 0.4,
                     PointRadius = 3
                 }
@@ -205,6 +268,48 @@
                     Tension = 0.5,
                     PointRadius = 0
                 }
+            } 
+        });
+    }
+    
+    public async Task FetchMoneyChart()
+    {
+        var moneyChartInfo = await Mediator.Send(new MoneyChartQuery(MoneyChartAmount));
+        await JS.InvokeAsync<string>("createChart", _moneyChart, new
+        {
+            labels = moneyChartInfo.Select(x => x.DateTime.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss")),
+            datasets = new List<Dataset>()
+            {
+                new Dataset()
+                {
+                    Label = "Hunt Dollars",
+                    Data = moneyChartInfo.Select(x => x.HuntDollars).ToList(),
+                    Fill = false,
+                    BorderColor = "rgb(75, 192, 192)",
+                    Tension = 0.5,
+                    PointRadius = 0
+                },
+            } 
+        });
+    }
+    
+    public async Task FetchXpChart()
+    {
+        var XpChartInfo = await Mediator.Send(new XpChartQuery(XpChartAmount));
+        await JS.InvokeAsync<string>("createChart", _xpChart, new
+        {
+            labels = XpChartInfo.Select(x => x.DateTime.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss")),
+            datasets = new List<Dataset>()
+            {
+                new Dataset()
+                {
+                    Label = "XP",
+                    Data = XpChartInfo.Select(x => x.Xp).ToList(),
+                    Fill = false,
+                    BorderColor = "rgb(75, 192, 192)",
+                    Tension = 0.5,
+                    PointRadius = 0
+                },
             } 
         });
     }

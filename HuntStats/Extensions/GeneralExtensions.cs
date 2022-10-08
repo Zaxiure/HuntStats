@@ -2,6 +2,7 @@ namespace HuntStats.Extensions;
 
 public static class GeneralExtensions
 {
+
     public static int ToStarRating(this int value)
     {
         if (value >= 0 && value < 2000)
