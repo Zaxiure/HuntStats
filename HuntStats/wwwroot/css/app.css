@@ -23,12 +23,21 @@ body.no-anim * {
   display: inline-block;
 }
 .pagination .page-link, .pagination .page-link:first-child, .pagination .page-link:last-child {
-  background-color: #1e2026 !important;
+  cursor: pointer;
   border: unset;
-  margin: 0px 15px;
+  background-color: transparent !important;
+  margin: 0px 10px;
   color: #fff;
   padding: 5px 15px;
   border-radius: 10px;
+  border: 2px solid #343740;
+  transition: border-color 0.3s;
+}
+.pagination .page-link.active, .pagination .page-link:first-child.active, .pagination .page-link:last-child.active {
+  border-color: #0a58ca !important;
+}
+.pagination .page-link:hover, .pagination .page-link:first-child:hover, .pagination .page-link:last-child:hover {
+  border-color: #0a58ca !important;
 }
 
 @keyframes shadowIn {
