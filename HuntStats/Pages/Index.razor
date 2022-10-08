@@ -101,29 +101,25 @@
     public async Task HandleKillChartChange(int Id)
     {
         KillChartAmount = Id;
-        await JS.InvokeAsync<string>("resetChart", _killChart);
-        await FetchKillChart();
+        await FetchKillChart(true);
     }
     
     public async Task HandleMmrChartChange(int Id)
     {
         MmrChartAmount = Id;
-        await JS.InvokeAsync<string>("resetChart", _mmrChart);
-        await FetchMmrChart();
+        await FetchMmrChart(true);
     }
     
     public async Task HandleMoneyChartChange(int Id)
     {
         MoneyChartAmount = Id;
-        await JS.InvokeAsync<string>("resetChart", _moneyChart);
-        await FetchMoneyChart();
+        await FetchMoneyChart(true);
     }
 
     public async Task HandleXpChartChange(int Id)
     {
         XpChartAmount = Id;
-        await JS.InvokeAsync<string>("resetChart", _xpChart);
-        await FetchXpChart();
+        await FetchXpChart(true);
     }
 
     public List<DropdownSelect<int>.ListItem> ListItems { get; set; } = new()
@@ -169,24 +165,22 @@
 
     private async void AppStateOnNewMatchAdded()
     {
-        await HandleKillChartChange(KillChartAmount);
-        await HandleMmrChartChange(MmrChartAmount);
-        await HandleMoneyChartChange(MoneyChartAmount);
-        await HandleXpChartChange(XpChartAmount);
+        await GetChartInfo(true);
         StateHasChanged();
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task GetChartInfo()
+    private async Task GetChartInfo(bool reset = false)
     {
-        await FetchKillChart();
-        await FetchMmrChart();
-        await FetchMoneyChart();
-        await FetchXpChart();
+        await FetchKillChart(reset);
+        await FetchMmrChart(reset);
+        await FetchMoneyChart(reset);
+        await FetchXpChart(reset);
     }
 
-    public async Task FetchKillChart()
+    public async Task FetchKillChart(bool reset = false)
     {
+        if(reset) await JS.InvokeAsync<string>("resetChart", _killChart);
         var killChartInfo = await Mediator.Send(new KillChartQuery(KillChartAmount));
         TotalKills = killChartInfo.Select(x => x.Kills).Sum();
         TotalYourKills = killChartInfo.Select(x => x.YourKills).Sum();
@@ -237,14 +231,10 @@
         });
     }
 
-    public async Task FetchMmrChart()
+    public async Task FetchMmrChart(bool reset = false)
     {
+        if(reset) await JS.InvokeAsync<string>("resetChart", _mmrChart);
         var mmrChartInfo = await Mediator.Send(new MmrChartQuery(MmrChartAmount));
-        // var mmrMax = mmrChartInfo.Select(x => x.Mmr).Max();
-        // var mmrMin = mmrChartInfo.Select(x => x.Mmr).Min();
-        // var totalMmrMax = mmrChartInfo.Select(x => x.TotalMmr).Max();
-        // var totalMmrMin = mmrChartInfo.Select(x => x.TotalMmr).Min();
-        // Math.Abs()
         await JS.InvokeAsync<string>("createChart", _mmrChart, new
         {
             labels = mmrChartInfo.Select(x => x.DateTime.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss")),
@@ -272,8 +262,9 @@
         });
     }
     
-    public async Task FetchMoneyChart()
+    public async Task FetchMoneyChart(bool reset = false)
     {
+        if(reset) await JS.InvokeAsync<string>("resetChart", _moneyChart);
         var moneyChartInfo = await Mediator.Send(new MoneyChartQuery(MoneyChartAmount));
         await JS.InvokeAsync<string>("createChart", _moneyChart, new
         {
@@ -293,8 +284,9 @@
         });
     }
     
-    public async Task FetchXpChart()
+    public async Task FetchXpChart(bool reset = false)
     {
+        if(reset) await JS.InvokeAsync<string>("resetChart", _xpChart);
         var XpChartInfo = await Mediator.Send(new XpChartQuery(XpChartAmount));
         await JS.InvokeAsync<string>("createChart", _xpChart, new
         {
