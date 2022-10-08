@@ -8,11 +8,22 @@
   }
   
   .page-link, .page-link:first-child, .page-link:last-child {
-    background-color: #1e2026 !important;
+    cursor: pointer;
     border: unset;
-    margin: 0px 15px;
+    background-color: transparent !important;
+    margin: 0px 10px;
     color: #fff;
     padding: 5px 15px;
     border-radius: 10px;
+    border: 2px solid #343740;
+    transition: border-color .3s;
+    
+    &.active {
+      border-color: #0a58ca !important;
+    }
+    
+    &:hover {
+      border-color: #0a58ca !important;
+    }
   }
 }
