@@ -162,36 +162,31 @@
     protected override async Task OnInitializedAsync()
     {
         AppState.NewMatchAdded += AppStateOnNewMatchAdded;
-        MatchView = await Mediator.Send(new GetMatchCommand()
-            {
-                OrderType = OrderType,
-                Page = Page,
-                PageSize = PageSize
-            });
+        await RefreshMatchList();
         Settings = await Mediator.Send(new GetSettingsCommand());
     }
 
-    private async Task HandleOrderTypeChange(OrderType value)
+    private async Task RefreshMatchList()
     {
-        OrderType = value;
         MatchView = await Mediator.Send(new GetMatchCommand()
         {
             OrderType = OrderType,
             Page = Page,
             PageSize = PageSize
         });
+    }
+
+    private async Task HandleOrderTypeChange(OrderType value)
+    {
+        OrderType = value;
+        await RefreshMatchList();
     }
     
     private async Task HandlePageSizeChange(int value)
     {
         PageSize = value;
         Page = 1;
-        MatchView = await Mediator.Send(new GetMatchCommand()
-        {
-            OrderType = OrderType,
-            Page = Page,
-            PageSize = PageSize
-        });
+        await RefreshMatchList();
         StateHasChanged();
     }
     
@@ -200,12 +195,7 @@
 
     private async void AppStateOnNewMatchAdded()
     {
-        MatchView = await Mediator.Send(new GetMatchCommand()
-        {
-            OrderType = OrderType,
-            Page = Page,
-            PageSize = PageSize
-        });
+        await RefreshMatchList();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -228,12 +218,7 @@
     private async Task PageChanged(int newPage)
     {
         Page = newPage;
-        MatchView = await Mediator.Send(new GetMatchCommand()
-        {
-            OrderType = OrderType,
-            Page = Page,
-            PageSize = PageSize
-        });
+        await RefreshMatchList();
         await InvokeAsync(StateHasChanged);
     }
 
