@@ -42,6 +42,9 @@
                         KD: @(((double)TotalYourKills / TotalDeaths).ToString("#.##").Replace("NaN", "0"))
                     </div>
                     <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+                        KDA: @(((double)(TotalYourKills + TotalAssists) / TotalDeaths).ToString("#.##").Replace("NaN", "0"))
+                    </div>
+                    <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
                         Deaths: @TotalDeaths
                     </div>
                 </div>
