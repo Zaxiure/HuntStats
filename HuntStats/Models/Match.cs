@@ -17,6 +17,10 @@ public class HuntMatchTable
 public class HuntMatch : HuntMatchTable
 {
     public List<Team> Teams { get; set; }
+    
+    public List<Accolade> Accolades { get; set; }
+    
+    public List<HuntEntry> Entries { get; set; }
 
     public int TotalKillsWithTeammate { get; set; }
     

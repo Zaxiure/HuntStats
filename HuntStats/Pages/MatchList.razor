@@ -20,30 +20,93 @@
         <div class="card-body" style="position: relative">
             <DropdownSelect TValue="OrderType" ValueChanged="HandleOrderTypeChange" SearchDisabled="true" Value="OrderType" ListItems="ListItems"></DropdownSelect>
             <div class="table-wrapper mt-2">
-                <table class="table table-dark data-table" style="margin-bottom: 0 !important;">
+                <table class="table table-dark data-table table-hover" style="margin-bottom: 0 !important;">
                     <thead>
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">Date</th>
                         <th scope="col">Teams</th>
                         <th scope="col">Total Players</th>
+                        <th scope="col">Xp</th>
+                        <th scope="col">HuntDollars</th>
+                        <th scope="col">KDA</th>
+                        <th scope="col">Bosses</th>
                         @if (Settings.PlayerProfileId != null || Settings.PlayerProfileId != string.Empty || Settings.PlayerProfileId != "0")
                         {
                             <th>
                                 MMR
                             </th>
                         }
-                        <th>Actions</th>
+                        <th width="150">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach (var match in MatchView.Matches)
                     {
-                        <tr>
+                        <tr @onclick='() => { NavigationManager.NavigateTo("/match/" + match.Id); }'>
                             <th scope="row">@match.Id</th>
                             <td>@match.DateTime.ToLocalTime()</td>
                             <td>@match.Teams.Count</td>
                             <td>@match.Teams.Select(x => x.Players.Count).Sum()</td>
+                            <td>
+                                @{
+                                    var Xp = 0;
+                                    Xp += match.Accolades.Select(x => x.Bounty).Sum() * 4;
+                                    Xp += match.Accolades.Select(x => x.Xp).Sum();
+                                }
+                                @(Xp)
+                            </td>
+                            <td>
+                                @{
+                                    var HuntDollars = 0;
+                                    HuntDollars += match.Accolades.Select(x => x.Bounty).Sum();
+                                    var entry = match.Entries.FirstOrDefault(x => x.Category == "accolade_found_gold");
+                                    if (entry != null) HuntDollars += entry.RewardSize;
+                                }
+                                @(HuntDollars)
+                            </td>
+                            <td>
+                                @{
+                                    var Assists = 0;
+                                    if (match.Accolades.FirstOrDefault(x => x.Category == "accolade_players_killed_assist") != null) Assists = match.Accolades.FirstOrDefault(x => x.Category == "accolade_players_killed_assist").Hits;
+                                    var kda = ((double)(match.TotalKills + Assists) / match.TotalDeaths).ToString("#.##");
+                                }
+                                @if (match.TotalDeaths == 0)
+                                {
+                                    @(match.TotalKills + Assists)
+                                }
+                                else
+                                {
+                                    if ((match.TotalKills + Assists) == 0 && match.TotalDeaths > 0)
+                                    {
+                                        @("0")
+                                    }
+                                    else
+                                    {
+                                        @kda
+                                    }
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-around" style="font-size: 21px">
+                                    @if (match.Spider)
+                                    {
+                                        <i class="far fa-spider"></i>
+                                    }
+                                    @if (match.Assassin)
+                                    {
+                                        <i class="far fa-scalpel"></i>
+                                    }
+                                    @if (match.Butcher)
+                                    {
+                                        <i class="far fa-pig"></i>
+                                    }
+                                    @if (match.Scrapbeak)
+                                    {
+                                        <i class="far fa-crow"></i>
+                                    }
+                                </div>
+                            </td>
                             @if (Settings.PlayerProfileId != null || Settings.PlayerProfileId != string.Empty || Settings.PlayerProfileId != "0")
                             {
                                 <td>
@@ -56,10 +119,10 @@
                             @if (DeleteMatches.Contains(match))
                             {
                                 <td>
-                                    <div class="btn btn-primary" @onclick="async () => { await DeleteMatch(match); }" color="">
+                                    <div @onclick:preventDefault="true" @onclick:stopPropagation="true" class="btn btn-primary" @onclick="async () => { await DeleteMatch(match); }" color="">
                                         <i class="fal fa-check" style="color: #C6EBC5;"></i>
                                     </div>
-                                    <div @onclick="() => { RemoveFromDelete(match); }" class="btn btn-primary" color="">
+                                    <div @onclick:preventDefault="true" @onclick:stopPropagation="true" @onclick="() => { RemoveFromDelete(match); }" class="btn btn-primary" color="">
                                         <i class="fal fa-times" style="color: #F96666;"></i>
                                     </div>
                                 </td>
@@ -67,10 +130,10 @@
                             else
                             {
                                 <td>
-                                    <div @onclick='() => { NavigationManager.NavigateTo("/match/" + match.Id); }' class="btn btn-primary">
+                                    <div @onclick:preventDefault="true" @onclick:stopPropagation="true" @onclick='() => { NavigationManager.NavigateTo("/match/" + match.Id); }' class="btn btn-primary">
                                         <i class="fal fa-eye"></i>
                                     </div>
-                                    <div @onclick="() => { AddToDelete(match); }" class="btn btn-primary">
+                                    <div @onclick:preventDefault="true" @onclick:stopPropagation="true" @onclick="() => { AddToDelete(match); }" class="btn btn-primary">
                                         <i class="fal fa-trash"></i>
                                     </div>
                                 </td>
@@ -162,6 +225,9 @@
     protected override async Task OnInitializedAsync()
     {
         AppState.NewMatchAdded += AppStateOnNewMatchAdded;
+        OrderType = AppState.OrderType;
+        Page = AppState.CurrentPage;
+        PageSize = AppState.PageSize;
         await RefreshMatchList();
         Settings = await Mediator.Send(new GetSettingsCommand());
     }
@@ -174,6 +240,9 @@
             Page = Page,
             PageSize = PageSize
         });
+        AppState.OrderType = OrderType;
+        AppState.CurrentPage = Page;
+        AppState.PageSize = PageSize;
     }
 
     private async Task HandleOrderTypeChange(OrderType value)
