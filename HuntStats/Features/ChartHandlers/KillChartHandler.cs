@@ -62,6 +62,6 @@ public class KillChartQueryHandler : IRequestHandler<KillChartQuery, List<KillCh
                 };
             }
             return null;
-        }).Where(x => x != null).Select(x => x.Result).OrderBy(x => x.DateTime).ToList();
+        }).Select(x => x.Result).Where(x => x != null).OrderBy(x => x.DateTime).ToList();
     }
 }

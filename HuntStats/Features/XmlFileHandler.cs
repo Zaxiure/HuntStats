@@ -319,10 +319,10 @@ public class XmlFileQueryHandler : IRequestHandler<XmlFileQuery, GeneralStatus>
                         MatchId = matchId
                     });
                 }
+                _appState.MatchAdded();
             }
             
             
-            _appState.MatchAdded();
             return GeneralStatus.Succes;
         }
         catch (Exception e)

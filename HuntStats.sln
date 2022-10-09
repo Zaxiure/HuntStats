@@ -4,8 +4,6 @@ VisualStudioVersion = 17.0.31611.283
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HuntStats", "HuntStats\HuntStats.csproj", "{D4953EB7-30D6-460C-BDAC-E7FE2F0D4345}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "HuntStatsSetup", "HuntStatsSetup\HuntStatsSetup.vdproj", "{A54882C3-48DB-4861-8A24-477D4E99874A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		All|Any CPU = All|Any CPU
@@ -34,12 +32,6 @@ Global
 		{D4953EB7-30D6-460C-BDAC-E7FE2F0D4345}.Release|x86.ActiveCfg = Release|Any CPU
 		{D4953EB7-30D6-460C-BDAC-E7FE2F0D4345}.Release|x86.Build.0 = Release|Any CPU
 		{D4953EB7-30D6-460C-BDAC-E7FE2F0D4345}.Release|x86.Deploy.0 = Release|Any CPU
-		{A54882C3-48DB-4861-8A24-477D4E99874A}.All|Any CPU.ActiveCfg = Debug
-		{A54882C3-48DB-4861-8A24-477D4E99874A}.All|x86.ActiveCfg = Debug
-		{A54882C3-48DB-4861-8A24-477D4E99874A}.Debug|Any CPU.ActiveCfg = Debug
-		{A54882C3-48DB-4861-8A24-477D4E99874A}.Debug|x86.ActiveCfg = Debug
-		{A54882C3-48DB-4861-8A24-477D4E99874A}.Release|Any CPU.ActiveCfg = Release
-		{A54882C3-48DB-4861-8A24-477D4E99874A}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
