@@ -34,44 +34,30 @@
 
 		window.resetChart = (el) => {
 			var chartToRefresh = charts.filter(x => x.canvas == el)[0];
-			chartToRefresh.destroy();
-			charts.splice(charts.indexOf(chartToRefresh), 1);
+			if(chartToRefresh !== undefined) {
+				chartToRefresh.destroy();
+				charts.splice(charts.indexOf(chartToRefresh), 1);
+			}
 		}
 		
 		window.resetCharts = () => {
 			charts.forEach(x => {
-				x.destroy();
+				if(x !== undefined) {
+					if(x.destroy !== undefined) {
+						x.destroy();
+					}
+				}
 			})
 			charts = [];
 		}
 		
 		window.createChart = (chartElement, data) => {
-			console.log(data);
-			console.log(chartElement);
-			// var labels = Utils.months({count: 7});
 			charts = [...charts, new Chart(chartElement, {
 				type: "line",
 				data: data,
 				options: {
 					responsive:true,
 					maintainAspectRatio: false,
-					// plugins: {
-					// 	annotation: {
-					// 		annotations: {
-					// 			line1: {
-					// 				type: 'line',
-					// 				yMin: 2000,
-					// 				yMax: 2000,
-					// 				label: {
-					// 					display: true,
-					// 					content: 'Test'
-					// 				},
-					// 				borderColor: 'rgb(255, 99, 132)',
-					// 				borderWidth: 2,
-					// 			}
-					// 		}
-					// 	}
-					// },
 					scales: {
 						y: {
 							suggestedMax: 10,

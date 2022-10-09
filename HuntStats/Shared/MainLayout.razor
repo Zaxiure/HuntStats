@@ -128,7 +128,7 @@
         }
     }
 
-    private void AppStateOnPathChangedEvent(string obj)
+    private async void AppStateOnPathChangedEvent(string obj)
     {
         Path = obj;
         if (worker != null)
@@ -138,7 +138,7 @@
                 if (!worker.CancellationPending && worker.IsBusy) worker.CancelAsync();
             }
         }
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     private void ConstructWorker()

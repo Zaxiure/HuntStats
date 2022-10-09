@@ -7,6 +7,7 @@
 @using HuntStats.Features
 @using HuntStats.Features.ChartHandlers
 @using HuntStats.Models
+@implements IDisposable
 @using HuntStats.State
 @using MediatR
 @inject IFolderPicker _folderPicker
@@ -152,11 +153,6 @@
         }
     };
 
-    public BackgroundWorker worker { get; set; }
-    public bool RunBackgroundTask { get; set; } = false;
-    public string FilePath { get; set; }
-    public string Path { get; set; } = "";
-
     protected override async Task OnInitializedAsync()
     {
         await Task.Yield();
@@ -164,10 +160,18 @@
         await GetChartInfo();
     }
 
+    public async void Dispose()
+    {
+        AppState.NewMatchAdded -= AppStateOnNewMatchAdded;
+        await JS.InvokeAsync<string>("resetChart", _killChart);
+        await JS.InvokeAsync<string>("resetChart", _mmrChart);
+        await JS.InvokeAsync<string>("resetChart", _xpChart);
+        await JS.InvokeAsync<string>("resetChart", _moneyChart);
+    }
+    
     private async void AppStateOnNewMatchAdded()
     {
         await GetChartInfo(true);
-        StateHasChanged();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -305,21 +309,5 @@
                 },
             } 
         });
-    }
-
-    public async Task ToggleCheck()
-    {
-        if (!worker.CancellationPending)
-        {
-            if (worker.IsBusy)
-            {
-                worker.CancelAsync();
-            }
-            else
-            {
-                worker.RunWorkerAsync();
-            }
-        }
-        StateHasChanged();
     }
 }
