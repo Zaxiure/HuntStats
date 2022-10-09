@@ -3,6 +3,10 @@ namespace HuntStats.Extensions;
 public static class GeneralExtensions
 {
 
+    public static string FirstLetterUpper(this string value)
+    {
+        return char.ToUpper(value[0]) + value.Substring(1);
+    }
     public static int ToStarRating(this int value)
     {
         if (value >= 0 && value < 2000)

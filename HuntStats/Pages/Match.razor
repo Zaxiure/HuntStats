@@ -151,6 +151,30 @@
             {
                 <div class="card-body">
                     <div class="totals">
+                        @if (HuntMatch.Spider)
+                        {
+                            <div class="kills">
+                                <i class="far fa-spider"></i>
+                            </div>
+                        }
+                        @if (HuntMatch.Assassin)
+                        {
+                            <div class="kills">
+                                <i class="far fa-scalpel"></i>
+                            </div>
+                        }
+                        @if (HuntMatch.Butcher)
+                        {
+                            <div class="kills">
+                                <i class="far fa-pig"></i>
+                            </div>
+                        }
+                        @if (HuntMatch.Scrapbeak)
+                        {
+                            <div class="kills">
+                                <i class="far fa-crow"></i>
+                            </div>
+                        }
                         <div class="kills">
                             Total kills: @Kills
                         </div>
@@ -163,6 +187,17 @@
                         <div class="deaths">
                             Deaths: @Deaths
                         </div>
+                        <div class="deaths">
+                            @{
+                                var Xp = 0;
+                                Xp += Accolades.Select(x => x.Bounty).Sum() * 4;
+                                Xp += Accolades.Select(x => x.Xp).Sum();
+                            }
+                            Xp: @Xp
+                        </div>
+                        <div class="deaths">
+                            Hunt Dollars: @HuntDollars
+                        </div>
                         @if (EventPoints != null)
                         {
                             <div class="eventpoints">
@@ -173,7 +208,7 @@
                             @{
                                 Mmr = HuntMatch.Teams.Select(x => x.Players.Select(x => x.Mmr).Sum() / x.Players.Count()).Sum() / HuntMatch.Teams.Count;
                             }
-                            Match MMR: 
+                            Match MMR:
                             @for (int i = 0; i < Mmr.ToStarRating(); i++)
                             {
                                 <i class="fas fa-star"></i>
@@ -183,6 +218,105 @@
                                 <i class="far fa-star"></i>
                             }
                             (@Mmr)
+                        </div>
+                    </div>
+                    <div class="xptable">
+                        <div class="table-wrapper mt-2">
+                            <table class="table table-dark data-table table-hover" style="margin-bottom: 0 !important;">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Amount</th>
+                                    <th>Xp</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var boss in Bosses)
+                                {
+                                    var clueEntry = Entries.Where(x => x.Category == "accolade_clues_found" && x.DescriptorName.Contains(boss));
+                                    @if (clueEntry.Count() != 0)
+                                    {
+                                        <tr>
+                                            <td>
+                                                Clue @boss found
+                                            </td>
+                                            <td>
+                                                @clueEntry.Count()
+                                            </td>
+                                            <td>
+                                                @(clueEntry.Select(x => x.RewardSize).Sum() * 4)
+                                            </td>
+                                        </tr>
+                                    }
+                                    @foreach (var entry in Entries.Where(x => x.Category.Contains(boss)))
+                                    {
+                                        <tr>
+                                            <td>
+                                                @entry.DescriptorName.FirstLetterUpper()
+                                            </td>
+                                            <td>
+                                                @entry.Amount
+                                            </td>
+                                            <td>
+                                                @(!entry.Category.Contains("banished") ? entry.RewardSize * 4 : entry.RewardSize)
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                @foreach (var entry in Entries.Where(x => x.Category == "accolade_monsters_killed"))
+                                {
+                                    <tr>
+                                        <td>
+                                            @entry.DescriptorName.FirstLetterUpper()
+                                        </td>
+                                        <td>
+                                            @entry.Amount
+                                        </td>
+                                        <td>
+                                            @entry.RewardSize
+                                        </td>
+                                    </tr>
+                                }
+                                @foreach (var entry in Entries.Where(x => x.Category == "accolade_players_killed"))
+                                {
+                                    <tr>
+                                        <td>
+                                            Kill @entry.DescriptorName.Split(" ")[4] star player
+                                        </td>
+                                        <td>
+                                            @entry.Amount
+                                        </td>
+                                        <td>
+                                            @entry.RewardSize
+                                        </td>
+                                    </tr>
+                                }
+                                @foreach (var entry in RemainingEntries)
+                                {
+                                    if (entry.RewardSize != 0)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @entry.DescriptorName.FirstLetterUpper()
+                                            </td>
+                                            <td>
+                                                @entry.Amount
+                                            </td>
+                                            <td>
+                                                @if (entry.Category == "accolade_trophy_extraction_bonus")
+                                                {
+                                                    @(entry.RewardSize*4)
+                                                }
+                                                else
+                                                {
+                                                    @entry.RewardSize
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -202,6 +336,12 @@
     public Models.Settings Settings { get; set; }
 
     public List<Accolade> Accolades { get; set; }
+    
+    public List<HuntEntry> Entries { get; set; }
+
+    public List<HuntEntry> RemainingEntries { get; set; }
+
+    public List<string> Bosses { get; set; } = new List<string>();
 
     public int Mmr { get; set; }
 
@@ -213,6 +353,8 @@
 
     public int YourKills { get; set; }
 
+    public int HuntDollars { get; set; } = 0;
+
     public int? EventPoints { get; set; } = null;
 
 
@@ -221,8 +363,27 @@
         if (Id != null)
         {
             HuntMatch = await Mediator.Send(new GetMatchbyIdCommand(Id));
+            if(HuntMatch.Spider) Bosses.Add(nameof(HuntMatch.Spider).ToLower());
+            if(HuntMatch.Assassin) Bosses.Add(nameof(HuntMatch.Assassin).ToLower());
+            if(HuntMatch.Scrapbeak) Bosses.Add(nameof(HuntMatch.Scrapbeak).ToLower());
+            if(HuntMatch.Butcher) Bosses.Add(nameof(HuntMatch.Butcher).ToLower());
             Team = HuntMatch.Teams[0];
             Accolades = await Mediator.Send((new GetAccoladesByMatchIdCommand(Id)));
+            Entries = await Mediator.Send((new GetEntriesByMatchIdCommand(Id)));
+            var huntDollars = 0;
+            huntDollars += Accolades.Select(x => x.Bounty).Sum();
+            var entry = Entries.FirstOrDefault(x => x.Category == "accolade_found_gold");
+            if(entry != null)
+            {
+                huntDollars += entry.RewardSize;
+            }
+            HuntDollars = huntDollars;
+            RemainingEntries = await Mediator.Send((new GetEntriesByMatchIdCommand(Id)));
+            RemainingEntries.RemoveAll(x => x.Category == "accolade_monsters_killed" || x.Category == "accolade_hunter_points" || x.Category == "accolade_found_gold" || x.Category == "accolade_players_killed" || x.Category == "accolade_clues_found");
+            foreach (var boss in Bosses)
+            {
+                RemainingEntries.RemoveAll(x => x.Category.Contains(boss));
+            }
             Settings = await Mediator.Send(new GetSettingsCommand());
             Kills = HuntMatch.Teams.Select(x => x.Players.Select(y => y.KilledByMe + y.DownedByMe + y.KilledByTeammate + y.DownedByTeammate).Sum()).Sum();
             YourKills = HuntMatch.Teams.Select(x => x.Players.Select(y => y.KilledByMe + y.DownedByMe).Sum()).Sum();

@@ -30,6 +30,7 @@
                         <th scope="col">Xp</th>
                         <th scope="col">HuntDollars</th>
                         <th scope="col">KDA</th>
+                        <th scope="col">Bosses</th>
                         @if (Settings.PlayerProfileId != null || Settings.PlayerProfileId != string.Empty || Settings.PlayerProfileId != "0")
                         {
                             <th>
@@ -86,6 +87,26 @@
                                     }
                                 }
                             </td>
+                            <td>
+                                <div class="d-flex justify-content-around" style="font-size: 21px">
+                                    @if (match.Spider)
+                                    {
+                                        <i class="far fa-spider"></i>
+                                    }
+                                    @if (match.Assassin)
+                                    {
+                                        <i class="far fa-scalpel"></i>
+                                    }
+                                    @if (match.Butcher)
+                                    {
+                                        <i class="far fa-pig"></i>
+                                    }
+                                    @if (match.Scrapbeak)
+                                    {
+                                        <i class="far fa-crow"></i>
+                                    }
+                                </div>
+                            </td>
                             @if (Settings.PlayerProfileId != null || Settings.PlayerProfileId != string.Empty || Settings.PlayerProfileId != "0")
                             {
                                 <td>
@@ -109,6 +130,9 @@
                             else
                             {
                                 <td>
+                                    <div @onclick:preventDefault="true" @onclick:stopPropagation="true" @onclick='() => { NavigationManager.NavigateTo("/match/" + match.Id); }' class="btn btn-primary">
+                                        <i class="fal fa-eye"></i>
+                                    </div>
                                     <div @onclick:preventDefault="true" @onclick:stopPropagation="true" @onclick="() => { AddToDelete(match); }" class="btn btn-primary">
                                         <i class="fal fa-trash"></i>
                                     </div>

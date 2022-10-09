@@ -76,6 +76,10 @@ public class GetMatchbyIdCommandHandler : IRequestHandler<GetMatchbyIdCommand, H
             {
                 Id = x.Id,
                 DateTime = x.DateTime,
+                Spider = x.Spider,
+                Assassin = x.Assassin,
+                Butcher = x.Butcher,
+                Scrapbeak = x.Scrapbeak,
                 Teams = teams.Select(team => new Team()
                 {
                     Id = team.Id,
@@ -129,6 +133,10 @@ public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, MatchView
                 DateTime = x.DateTime,
                 Accolades = accolades.ToList(),
                 Entries = entries.ToList(),
+                Spider = x.Spider,
+                Scrapbeak = x.Scrapbeak,
+                Assassin = x.Assassin,
+                Butcher = x.Butcher,
                 Teams = teams.Select(team => new Team()
                 {
                     Id = team.Id,
