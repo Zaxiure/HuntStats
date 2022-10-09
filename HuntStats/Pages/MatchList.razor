@@ -27,13 +27,16 @@
                         <th scope="col">Date</th>
                         <th scope="col">Teams</th>
                         <th scope="col">Total Players</th>
+                        <th scope="col">Xp</th>
+                        <th scope="col">HuntDollars</th>
+                        <th scope="col">KDA</th>
                         @if (Settings.PlayerProfileId != null || Settings.PlayerProfileId != string.Empty || Settings.PlayerProfileId != "0")
                         {
                             <th>
                                 MMR
                             </th>
                         }
-                        <th>Actions</th>
+                        <th width="150">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -44,6 +47,45 @@
                             <td>@match.DateTime.ToLocalTime()</td>
                             <td>@match.Teams.Count</td>
                             <td>@match.Teams.Select(x => x.Players.Count).Sum()</td>
+                            <td>
+                                @{
+                                    var Xp = 0;
+                                    Xp += match.Accolades.Select(x => x.Bounty).Sum() * 4;
+                                    Xp += match.Accolades.Select(x => x.Xp).Sum();
+                                }
+                                @(Xp)
+                            </td>
+                            <td>
+                                @{
+                                    var HuntDollars = 0;
+                                    HuntDollars += match.Accolades.Select(x => x.Bounty).Sum();
+                                    var entry = match.Entries.FirstOrDefault(x => x.Category == "accolade_found_gold");
+                                    if (entry != null) HuntDollars += entry.RewardSize;
+                                }
+                                @(HuntDollars)
+                            </td>
+                            <td>
+                                @{
+                                    var Assists = 0;
+                                    if (match.Accolades.FirstOrDefault(x => x.Category == "accolade_players_killed_assist") != null) Assists = match.Accolades.FirstOrDefault(x => x.Category == "accolade_players_killed_assist").Hits;
+                                    var kda = ((double)(match.TotalKills + Assists) / match.TotalDeaths).ToString("#.##");
+                                }
+                                @if (match.TotalDeaths == 0)
+                                {
+                                    @(match.TotalKills + Assists)
+                                }
+                                else
+                                {
+                                    if ((match.TotalKills + Assists) == 0 && match.TotalDeaths > 0)
+                                    {
+                                        @("0")
+                                    }
+                                    else
+                                    {
+                                        @kda
+                                    }
+                                }
+                            </td>
                             @if (Settings.PlayerProfileId != null || Settings.PlayerProfileId != string.Empty || Settings.PlayerProfileId != "0")
                             {
                                 <td>
@@ -67,9 +109,6 @@
                             else
                             {
                                 <td>
-                                    @* <div @onclick='() => { NavigationManager.NavigateTo("/match/" + match.Id); }' class="btn btn-primary"> *@
-                                    @*     <i class="fal fa-eye"></i> *@
-                                    @* </div> *@
                                     <div @onclick:preventDefault="true" @onclick:stopPropagation="true" @onclick="() => { AddToDelete(match); }" class="btn btn-primary">
                                         <i class="fal fa-trash"></i>
                                     </div>

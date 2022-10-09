@@ -121,10 +121,14 @@ public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, MatchView
         var mappedHuntMatch = matches.Select(async x =>
         {
             var teams = await con.SelectAsync<TeamTable>(j => j.MatchId == x.Id);
+            var accolades = await con.SelectAsync<Accolade>(j => j.MatchId == x.Id);
+            var entries = await con.SelectAsync<HuntEntry>(j => j.MatchId == x.Id);
             var huntMatch = new HuntMatch()
             {
                 Id = x.Id,
                 DateTime = x.DateTime,
+                Accolades = accolades.ToList(),
+                Entries = entries.ToList(),
                 Teams = teams.Select(team => new Team()
                 {
                     Id = team.Id,
@@ -132,11 +136,11 @@ public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, MatchView
                     Players = JsonConvert.DeserializeObject<List<Player>>(team.Players)
                 }).ToList()
             };
-            huntMatch.TotalKills = huntMatch.Teams.Select(x => x.Players.Select(x => x.KilledByMe).Sum()).Sum();
+            huntMatch.TotalKills = huntMatch.Teams.Select(x => x.Players.Select(x => x.KilledByMe + x.DownedByMe).Sum()).Sum();
             huntMatch.TotalKillsWithTeammate = huntMatch.TotalKills +
                                                huntMatch.Teams.Select(x =>
                                                    x.Players.Select(x => x.KilledByTeammate).Sum()).Sum();
-            huntMatch.TotalDeaths = huntMatch.Teams.Select(x => x.Players.Select(x => x.KilledByMe).Sum()).Sum();
+            huntMatch.TotalDeaths = huntMatch.Teams.Select(x => x.Players.Select(x => x.KilledMe + x.DownedMe).Sum()).Sum();
 
             return huntMatch;
         }).Select(x => x.Result);
