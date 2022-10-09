@@ -39,7 +39,7 @@
                         Assists: @TotalAssists
                     </div>
                     <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
-                        K/D: @(((double)TotalYourKills / TotalDeaths).ToString("#.##"))
+                        KD: @(((double)TotalYourKills / TotalDeaths).ToString("#.##").Replace("NaN", "0"))
                     </div>
                     <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
                         Deaths: @TotalDeaths
@@ -47,13 +47,21 @@
                 </div>
             </div>
         </div>
-        <div class="card col position-relative mt-4 mt-xl-0 ms-xl-2" style="max-height: 500px;">
+        <div class="card col position-relative mt-4 mt-xl-0 ms-xl-2">
             <div class="card-body">
                 <DropdownSelect TValue="int" SearchDisabled="true" ValueChanged="HandleMmrChartChange" Value="MmrChartAmount" ListItems="ListItems"></DropdownSelect>
                 <div class="mmrChart">
                     <canvas @ref="_mmrChart" id="chart" width="400" height="400">
 
                     </canvas>
+                </div>
+                 <div class="d-flex flex-row justify-content-between mt-2">
+                    <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+                        Average Mmr: @AverageMmr
+                    </div>
+                    <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+                        Average Match Mmr: @AverageMatchMmr
+                    </div>
                 </div>
             </div>
         </div>
@@ -67,15 +75,25 @@
 
                     </canvas>
                 </div>
+                <div class="d-flex flex-row justify-content-between mt-2">
+                    <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+                        Average: @AverageMoney
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="card col position-relative mt-4 mt-xl-0 ms-xl-2" style="max-height: 500px;">
+        <div class="card col position-relative mt-4 mt-xl-0 ms-xl-2">
             <div class="card-body">
                 <DropdownSelect TValue="int" SearchDisabled="true" ValueChanged="HandleXpChartChange" Value="XpChartAmount" ListItems="ListItems"></DropdownSelect>
                 <div class="moneyChart">
                     <canvas @ref="_xpChart" id="chart" width="400" height="400">
 
                     </canvas>
+                </div>
+                <div class="d-flex flex-row justify-content-between mt-2">
+                    <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+                        Average: @AverageXp
+                    </div>
                 </div>
             </div>
         </div>
@@ -99,6 +117,10 @@
     public int TotalYourKills { get; set; }
     public int TotalDeaths { get; set; }
     public int TotalAssists { get; set; }
+    public int AverageMmr { get; set; } = 0;
+    public int AverageMatchMmr { get; set; } = 0;
+    public int AverageMoney { get; set; } = 0;
+    public int AverageXp { get; set; } = 0;
 
     public async Task HandleKillChartChange(int Id)
     {
@@ -240,6 +262,13 @@
     {
         if(reset) await JS.InvokeAsync<string>("resetChart", _mmrChart);
         var mmrChartInfo = await Mediator.Send(new MmrChartQuery(MmrChartAmount));
+        var totalMmr = mmrChartInfo.Select(x => x.Mmr).Sum();
+        var totalMatchMmr = mmrChartInfo.Select(x => x.TotalMmr).Sum();
+        if (mmrChartInfo.Count != 0 && totalMmr != 0 && totalMatchMmr != 0)
+        {
+            AverageMmr = totalMmr / mmrChartInfo.Count;
+            AverageMatchMmr = totalMatchMmr / mmrChartInfo.Count;
+        }
         await JS.InvokeAsync<string>("createChart", _mmrChart, new
         {
             labels = mmrChartInfo.Select(x => x.DateTime.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss")),
@@ -271,6 +300,11 @@
     {
         if(reset) await JS.InvokeAsync<string>("resetChart", _moneyChart);
         var moneyChartInfo = await Mediator.Send(new MoneyChartQuery(MoneyChartAmount));
+        var totalHuntDollars = moneyChartInfo.Select(x => x.HuntDollars).Sum();
+        if (moneyChartInfo.Count != 0 && totalHuntDollars != 0)
+        {
+            AverageMoney = totalHuntDollars / moneyChartInfo.Count;
+        }
         await JS.InvokeAsync<string>("createChart", _moneyChart, new
         {
             labels = moneyChartInfo.Select(x => x.DateTime.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss")),
@@ -292,16 +326,21 @@
     public async Task FetchXpChart(bool reset = false)
     {
         if(reset) await JS.InvokeAsync<string>("resetChart", _xpChart);
-        var XpChartInfo = await Mediator.Send(new XpChartQuery(XpChartAmount));
+        var xpChartInfo = await Mediator.Send(new XpChartQuery(XpChartAmount));
+        var totalXp = xpChartInfo.Select(x => x.Xp).Sum();
+        if (xpChartInfo.Count != 0 && totalXp != 0)
+        {
+            AverageXp = xpChartInfo.Select(x => x.Xp).Sum() / xpChartInfo.Count;
+        }
         await JS.InvokeAsync<string>("createChart", _xpChart, new
         {
-            labels = XpChartInfo.Select(x => x.DateTime.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss")),
+            labels = xpChartInfo.Select(x => x.DateTime.ToLocalTime().ToString("dd-MM-yyyy HH:mm:ss")),
             datasets = new List<Dataset>()
             {
                 new Dataset()
                 {
                     Label = "XP",
-                    Data = XpChartInfo.Select(x => x.Xp).ToList(),
+                    Data = xpChartInfo.Select(x => x.Xp).ToList(),
                     Fill = false,
                     BorderColor = "rgb(75, 192, 192)",
                     Tension = 0.5,
