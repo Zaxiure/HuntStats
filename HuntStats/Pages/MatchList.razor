@@ -162,6 +162,9 @@
     protected override async Task OnInitializedAsync()
     {
         AppState.NewMatchAdded += AppStateOnNewMatchAdded;
+        OrderType = AppState.OrderType;
+        Page = AppState.CurrentPage;
+        PageSize = AppState.PageSize;
         await RefreshMatchList();
         Settings = await Mediator.Send(new GetSettingsCommand());
     }
@@ -174,6 +177,9 @@
             Page = Page,
             PageSize = PageSize
         });
+        AppState.OrderType = OrderType;
+        AppState.CurrentPage = Page;
+        AppState.PageSize = PageSize;
     }
 
     private async Task HandleOrderTypeChange(OrderType value)

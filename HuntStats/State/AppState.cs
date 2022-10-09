@@ -28,6 +28,10 @@ public class AppState
 
     public string LastOpenedUniqueId;
 
+    public int CurrentPage { get; set; } = 1;
+    public OrderType OrderType { get; set; } = OrderType.Descending;
+    public int PageSize { get; set; } = 10;
+
     public void NavigatingTo(string url)
     {
         NavigateTo?.Invoke(url);
