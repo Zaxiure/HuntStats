@@ -20,7 +20,7 @@
         <div class="card-body" style="position: relative">
             <DropdownSelect TValue="OrderType" ValueChanged="HandleOrderTypeChange" SearchDisabled="true" Value="OrderType" ListItems="ListItems"></DropdownSelect>
             <div class="table-wrapper mt-2">
-                <table class="table table-dark data-table" style="margin-bottom: 0 !important;">
+                <table class="table table-dark data-table table-hover" style="margin-bottom: 0 !important;">
                     <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -39,7 +39,7 @@
                     <tbody>
                     @foreach (var match in MatchView.Matches)
                     {
-                        <tr>
+                        <tr @onclick='() => { NavigationManager.NavigateTo("/match/" + match.Id); }'>
                             <th scope="row">@match.Id</th>
                             <td>@match.DateTime.ToLocalTime()</td>
                             <td>@match.Teams.Count</td>
@@ -56,10 +56,10 @@
                             @if (DeleteMatches.Contains(match))
                             {
                                 <td>
-                                    <div class="btn btn-primary" @onclick="async () => { await DeleteMatch(match); }" color="">
+                                    <div @onclick:preventDefault="true" @onclick:stopPropagation="true" class="btn btn-primary" @onclick="async () => { await DeleteMatch(match); }" color="">
                                         <i class="fal fa-check" style="color: #C6EBC5;"></i>
                                     </div>
-                                    <div @onclick="() => { RemoveFromDelete(match); }" class="btn btn-primary" color="">
+                                    <div @onclick:preventDefault="true" @onclick:stopPropagation="true" @onclick="() => { RemoveFromDelete(match); }" class="btn btn-primary" color="">
                                         <i class="fal fa-times" style="color: #F96666;"></i>
                                     </div>
                                 </td>
@@ -67,10 +67,10 @@
                             else
                             {
                                 <td>
-                                    <div @onclick='() => { NavigationManager.NavigateTo("/match/" + match.Id); }' class="btn btn-primary">
-                                        <i class="fal fa-eye"></i>
-                                    </div>
-                                    <div @onclick="() => { AddToDelete(match); }" class="btn btn-primary">
+                                    @* <div @onclick='() => { NavigationManager.NavigateTo("/match/" + match.Id); }' class="btn btn-primary"> *@
+                                    @*     <i class="fal fa-eye"></i> *@
+                                    @* </div> *@
+                                    <div @onclick:preventDefault="true" @onclick:stopPropagation="true" @onclick="() => { AddToDelete(match); }" class="btn btn-primary">
                                         <i class="fal fa-trash"></i>
                                     </div>
                                 </td>

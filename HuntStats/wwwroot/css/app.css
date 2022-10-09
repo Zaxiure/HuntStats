@@ -532,6 +532,11 @@ body.preload * {
   padding-bottom: 5px;
 }
 
+.table-dark {
+  --bs-table-bg: transparent !important;
+  --bs-table-hover-bg: #00000029 !important;
+}
+
 .table-wrapper {
   overflow: hidden;
   border: 2px solid #373b3e;
@@ -569,6 +574,7 @@ table.data-table thead {
 }
 
 table.data-table tr, table.data-table td {
+  cursor: pointer;
   border: 1px solid #373b3e;
 }
 
