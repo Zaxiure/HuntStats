@@ -101,6 +101,33 @@
             </div>
         </div>
     </div>
+    <div class="chart-container d-flex flex-xl-row flex-column mt-3">
+        <div class="card col position-relative me-xl-2" style="max-height: 750px;">
+            <div class="card-body">
+                <DropdownSelect TValue="int" SearchDisabled="true" ValueChanged="HandleBossChartChange" Value="BossChartAmount" ListItems="ListItems"></DropdownSelect>
+                <div class="moneyChart">
+                    <canvas @ref="_bossChart" id="chart" width="400" height="400">
+
+                    </canvas>
+                </div>
+                <div class="d-flex flex-row justify-content-between mt-2">
+                    <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+                        Spider: @Spider
+                    </div>
+                    <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+                        Scrapbeak: @Scrapbeak
+                    </div>
+                    <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+                        Butcher: @Butcher
+                    </div>
+                    <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+                        Assassin: @Assassin
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col"></div>
+    </div>
 </div> 
 
 
@@ -111,10 +138,12 @@
     private ElementReference _killChart;
     private ElementReference _moneyChart;
     private ElementReference _xpChart;
+    private ElementReference _bossChart;
 
     public int MmrChartAmount { get; set; } = 25;
     public int MoneyChartAmount { get; set; } = 25;
     public int KillChartAmount { get; set; } = 25;
+    public int BossChartAmount { get; set; } = 25;
     public int XpChartAmount { get; set; } = 25;
     public int TotalKills { get; set; }
     public int TotalYourKills { get; set; }
@@ -124,11 +153,21 @@
     public int AverageMatchMmr { get; set; } = 0;
     public int AverageMoney { get; set; } = 0;
     public int AverageXp { get; set; } = 0;
+    public int Spider { get; set; } = 0;
+    public int Scrapbeak { get; set; } = 0;
+    public int Butcher { get; set; } = 0;
+    public int Assassin { get; set; } = 0;
 
     public async Task HandleKillChartChange(int Id)
     {
         KillChartAmount = Id;
         await FetchKillChart(true);
+    }
+    
+    public async Task HandleBossChartChange(int Id)
+    {
+        BossChartAmount = Id;
+        await FetchBossChart(true);
     }
     
     public async Task HandleMmrChartChange(int Id)
@@ -192,6 +231,7 @@
         await JS.InvokeAsync<string>("resetChart", _mmrChart);
         await JS.InvokeAsync<string>("resetChart", _xpChart);
         await JS.InvokeAsync<string>("resetChart", _moneyChart);
+        await JS.InvokeAsync<string>("resetChart", _bossChart);
     }
     
     private async void AppStateOnNewMatchAdded()
@@ -206,7 +246,51 @@
         await FetchMmrChart(reset);
         await FetchMoneyChart(reset);
         await FetchXpChart(reset);
+        await FetchBossChart(reset);
     }
+    
+    public async Task FetchBossChart(bool reset = false)
+    {
+        if(reset) await JS.InvokeAsync<string>("resetChart", _bossChart);
+        var bossChartInfo = await Mediator.Send(new BossChartQuery(BossChartAmount));
+        Scrapbeak = bossChartInfo.Scrapbeak;
+        Assassin = bossChartInfo.Assassin;
+        Butcher = bossChartInfo.Butcher;
+        Spider = bossChartInfo.Spider;
+        await JS.InvokeAsync<string>("createPieChart", _bossChart, new
+        {
+            labels = new List<string>()
+            {
+                "Scrapbeak",
+                "Spider",
+                "Butcher",
+                "Assassin",
+            },
+            datasets = new List<Dataset>()
+            {
+                new Dataset()
+                {
+                    Label = "Bosses",
+                    Data = new List<int>()
+                    {
+                        bossChartInfo.Scrapbeak,
+                        bossChartInfo.Spider,
+                        bossChartInfo.Butcher,
+                        bossChartInfo.Assassin,
+                    },
+                    BackgroundColor = new List<string>()
+                    {
+                        "rgb(255, 99, 132)",
+                        "rgb(54, 162, 235)",
+                        "rgb(255, 205, 86)",
+                        "rgb(89, 206, 143)"
+                    },
+                    HoverOffset = 4
+                },
+            } 
+        });
+    }
+
 
     public async Task FetchKillChart(bool reset = false)
     {

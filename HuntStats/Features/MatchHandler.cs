@@ -193,6 +193,10 @@ public class GetAllMatchCommandHandler : IRequestHandler<GetAllMatchCommand, Lis
             {
                 Id = x.Id,
                 DateTime = x.DateTime,
+                Scrapbeak = x.Scrapbeak,
+                Assassin = x.Assassin,
+                Butcher = x.Butcher,
+                Spider = x.Spider,
                 Teams = teams.Select(team => new Team()
                 {
                     Id = team.Id,
