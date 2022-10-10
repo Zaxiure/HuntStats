@@ -9,6 +9,12 @@ public class Dataset
 
     [JsonPropertyName("data")]
     public List<int> Data { get; set; }
+    
+    [JsonPropertyName("backgroundColor")]
+    public List<string> BackgroundColor { get; set; }
+    
+    [JsonPropertyName("hoverOffset")]
+    public int HoverOffset { get; set; }
 
     [JsonPropertyName("fill")]
     public bool Fill { get; set; }

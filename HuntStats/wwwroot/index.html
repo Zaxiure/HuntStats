@@ -68,6 +68,18 @@
 			})]
 		}
 
+		window.createPieChart = (chartElement, data) => {
+			console.log(data);
+			charts = [...charts, new Chart(chartElement, {
+				type: "pie",
+				data: data,
+				options: {
+					responsive:true,
+					maintainAspectRatio: false,
+				}
+			})]
+		}
+
 		window.createDropdown = (clickElement, dropdownElement) => {
 			let dropdown = Popper.createPopper(clickElement, dropdownElement, {
 				placement: "bottom-start",

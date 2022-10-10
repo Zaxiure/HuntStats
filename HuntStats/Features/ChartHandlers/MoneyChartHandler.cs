@@ -33,29 +33,29 @@ public class MoneyChartQueryHandler : IRequestHandler<MoneyChartQuery, List<Mone
     public async Task<List<MoneyChartInfo>> Handle(MoneyChartQuery request, CancellationToken cancellationToken)
     {
         using var con = await _connectionFactory.GetOpenConnectionAsync();
-        var Matches = await _mediator.Send(new GetAllMatchCommand());
-        var Settings = await _mediator.Send(new GetSettingsCommand());
-        Matches = Matches.OrderByDescending(x => x.DateTime).Take(request.Amount).ToList();
+        var matches = await _mediator.Send(new GetAllMatchCommand());
+        var settings = await _mediator.Send(new GetSettingsCommand());
+        matches = matches.OrderByDescending(x => x.DateTime).Take(request.Amount).ToList();
         
-        return Matches.Select(async x =>
+        return matches.Select(async x =>
         {
             var accolades = await _mediator.Send(new GetAccoladesByMatchIdCommand(x.Id));
             var entries = await _mediator.Send(new GetEntriesByMatchIdCommand(x.Id));
-            var team = x.Teams.FirstOrDefault(x => x.Players.FirstOrDefault(y => y.ProfileId == Settings.PlayerProfileId) != null);
+            var team = x.Teams.FirstOrDefault(x => x.Players.FirstOrDefault(y => y.ProfileId == settings.PlayerProfileId) != null);
             if (team != null)
             {
-                var HuntDollars = 0;
-                HuntDollars += accolades.Select(x => x.Bounty).Sum();
+                var huntDollars = 0;
+                huntDollars += accolades.Select(x => x.Bounty).Sum();
                 var entry = entries.FirstOrDefault(x => x.Category == "accolade_found_gold");
                 if(entry != null)
                 {
-                    HuntDollars += entry.RewardSize;
+                    huntDollars += entry.RewardSize;
                 }
                 
                 return new MoneyChartInfo()
                 {
                     DateTime = x.DateTime,
-                    HuntDollars = HuntDollars
+                    HuntDollars = huntDollars
                 };
             }
             return null;
