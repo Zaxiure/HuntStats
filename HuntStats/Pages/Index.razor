@@ -17,7 +17,7 @@
 @inject AppState AppState
 @inject IJSRuntime JS
 
-<div class="card-container" style="margin:  auto;">
+<div class="card-container">
     <h3>Statistics</h3>
     <div class="chart-container d-flex flex-xl-row flex-column">
         <div class="card col position-relative me-xl-2" style="max-height: 750px;">
@@ -148,6 +148,7 @@
     public int TotalKills { get; set; }
     public int TotalYourKills { get; set; }
     public int TotalDeaths { get; set; }
+    public List<HuntMatch> Matches { get; set; }
     public int TotalAssists { get; set; }
     public int AverageMmr { get; set; } = 0;
     public int AverageMatchMmr { get; set; } = 0;
@@ -248,7 +249,14 @@
         await FetchXpChart(reset);
         await FetchBossChart(reset);
     }
-    
+
+    public async Task FetchAllMatches()
+    {
+        var matches = await Mediator.Send(new GetAllMatchCommand());
+        Matches = matches;
+
+    }
+
     public async Task FetchBossChart(bool reset = false)
     {
         if(reset) await JS.InvokeAsync<string>("resetChart", _bossChart);

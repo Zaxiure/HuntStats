@@ -19,7 +19,7 @@
     padding: 10px 8px;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
-    background-color: rgba(0,0,0,.5);
+    background-color: rgba(0, 0, 0, .5);
 
     .fa-chevron-left {
       display: block;
@@ -113,6 +113,7 @@
           display: inline-block;
         }
       }
+
       .nav-item:hover {
         //background-color: rgba(255,255,255,1);
         background-color: #1e2026;
@@ -332,7 +333,7 @@
       width: 100%;
       max-width: unset !important;
       height: calc(100vh - $header-size);
-      overflow: auto;
+      //overflow: auto;
       transition: opacity .15s ease-in-out;
 
       &.hidden {
@@ -343,7 +344,8 @@
 }
 
 .nav-dropdown-container {
-margin: 10px 0 !important;
+  margin: 10px 0 !important;
+
   a {
     text-align: left;
     display: block;
@@ -353,7 +355,7 @@ margin: 10px 0 !important;
     min-width: 75px;
     padding: 5px 10px;
     white-space: nowrap;
-    
+
     i {
       color: rgba(128, 128, 128, 0.85) !important;
     }

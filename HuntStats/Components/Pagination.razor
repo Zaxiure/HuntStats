@@ -122,9 +122,9 @@
             pages[Padding + 1 + i] = startValue + i;
         }
 
-        pages[Padding] = (Padding + PaddingInside / 2 + 1 < CurrentPage) ? -1 : Padding + 1;
+        pages[Padding] = Padding + PaddingInside / 2 + 1 < CurrentPage ? -1 : Padding + 1;
 
-        pages[length - Padding - 1] = (TotalPages - Padding - PaddingInside / 2 > CurrentPage) ? -1 : TotalPages - Padding;
+        pages[length - Padding - 1] = TotalPages - Padding - PaddingInside / 2 > CurrentPage ? -1 : TotalPages - Padding;
 
         for (var i = 0; i < length - 2; i++)
         {

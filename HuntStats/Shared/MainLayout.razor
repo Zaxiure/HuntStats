@@ -11,26 +11,24 @@
 @inject AppState _appState;
 @inject IDbConnectionFactory _connectionFactory;
 @inject IMediator _mediator
+@inject IJSRuntime JS
 
-<div class="layout" @onmousedown="_appState.ClickedOutside">
-    <div class="sidebar @SidebarClass()">
-        <div class="sidebar-wrapper">
+<div class="page" @onmousedown="_appState.ClickedOutside">
+    <div class="sidebar">
+        <div class="top-menu">
+            HuntStats
+        </div>
+        <div class="bottom-menu">
             <NavMenu/>
         </div>
     </div>
-    @* <div class="sidebar-faker"></div> *@
-    <div @onclick="ToggleSidebar" class="sidebar-backdrop">
+    <div class="sidebar-placeholder">
+        
     </div>
-    <div @onclick="ToggleSidebar" class="sidebar-toggle" id="sidebarToggle">
-        <i id="sidebarToggleIcon" class="far fa-chevron-left"></i>
-        <i id="sidebarToggleIcon" class="far fa-chevron-right"></i>
-    </div>
-    <div class="main">
-        <div class="header">
-            <a id="sidebarToggle" @onclick="ToggleSidebar" class="nav-link mobile-sidebar-toggle">
-                <i class="far fa-bars"></i>
-            </a>
-            <div class="right-header">
+
+    <main>
+        <div class="top-content">
+            <div class="right-content">
                 @if (Path == null || Path == string.Empty)
                 {
                     <button disabled class="btn btn-primary disabled">
@@ -63,12 +61,11 @@
                 }
             </div>
         </div>
-        <div class="container">
-            <div class="content">
+
+        <div class="bottom-content">
                 @Body
-            </div>
         </div>
-    </div>
+    </main>
 </div>
 
 
@@ -84,6 +81,14 @@
     {
         if (_sidebarClosed) return "closed";
         return "";
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("RemoveLoading");
+        }
     }
 
     public void ToggleSidebar()

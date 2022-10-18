@@ -9,27 +9,26 @@ namespace HuntStats.Features;
 
 public class GetSettingsCommand : IRequest<Settings>
 {
-    
 }
 
 public class GetSettingsCommandHandler : IRequestHandler<GetSettingsCommand, Settings>
 {
-    private readonly IDbConnectionFactory _connectionFactory;
     private readonly AppState _appState;
-    
+    private readonly IDbConnectionFactory _connectionFactory;
+
     public GetSettingsCommandHandler(IDbConnectionFactory connectionFactory, AppState appState)
     {
         _connectionFactory = connectionFactory;
         _appState = appState;
     }
-    
+
     public async Task<Settings> Handle(GetSettingsCommand request, CancellationToken cancellationToken)
     {
         using var con = await _connectionFactory.GetOpenConnectionAsync();
         var settings = await con.FirstOrDefaultAsync<Settings>(x => x.Id == 1);
         if (settings == null)
         {
-            settings = new Settings()
+            settings = new Settings
             {
                 Path = ""
             };
@@ -42,26 +41,26 @@ public class GetSettingsCommandHandler : IRequestHandler<GetSettingsCommand, Set
     }
 }
 
-public class ColumnsClass {
+public class ColumnsClass
+{
     public string name { get; set; }
 }
 
 public class InitializeDatabaseCommand : IRequest<GeneralStatus>
 {
-    
 }
 
 public class InitializeDatabaseCommandHandler : IRequestHandler<InitializeDatabaseCommand, GeneralStatus>
 {
-    private readonly IDbConnectionFactory _connectionFactory;
     private readonly AppState _appState;
-    
+    private readonly IDbConnectionFactory _connectionFactory;
+
     public InitializeDatabaseCommandHandler(IDbConnectionFactory connectionFactory, AppState appState)
     {
         _connectionFactory = connectionFactory;
         _appState = appState;
     }
-    
+
     public async Task<GeneralStatus> Handle(InitializeDatabaseCommand request, CancellationToken cancellationToken)
     {
         using var con = await _connectionFactory.GetOpenConnectionAsync();
@@ -135,17 +134,13 @@ create table if not exists Teams
         var StartWorkerOnBoot = columnCheck.FirstOrDefault(x => x.name == "StartWorkerOnBoot");
         var PlayerProfileId = columnCheck.FirstOrDefault(x => x.name == "PlayerProfileId");
         if (StartWorkerOnBoot == null)
-        {
             con.QueryAsync(@"alter table Settings
                                     add StartWorkerOnBoot integer default 0 not null;");
-        }
 
         if (PlayerProfileId == null)
-        {
             con.QueryAsync(@"alter table Settings
                 add PlayerProfileId nvarchar;
             ");
-        }
 
         return GeneralStatus.Succes;
     }
@@ -163,15 +158,15 @@ public class UpdateSettingsCommand : IRequest<GeneralStatus>
 
 public class UpdateSettingsCommandHandler : IRequestHandler<UpdateSettingsCommand, GeneralStatus>
 {
-    private readonly IDbConnectionFactory _connectionFactory;
     private readonly AppState _appState;
-    
+    private readonly IDbConnectionFactory _connectionFactory;
+
     public UpdateSettingsCommandHandler(IDbConnectionFactory connectionFactory, AppState appState)
     {
         _connectionFactory = connectionFactory;
         _appState = appState;
     }
-    
+
     public async Task<GeneralStatus> Handle(UpdateSettingsCommand request, CancellationToken cancellationToken)
     {
         var huntFilePath = request.Settings.Path + @"\user\profiles\default\attributes.xml";
@@ -181,7 +176,7 @@ public class UpdateSettingsCommandHandler : IRequestHandler<UpdateSettingsComman
         if (!fileExists) request.Settings.Path = "";
         if (settings == null)
         {
-            await con.InsertAsync(new Settings()
+            await con.InsertAsync(new Settings
             {
                 Path = request.Settings.Path,
                 StartWorkerOnBoot = request.Settings.StartWorkerOnBoot
@@ -194,6 +189,7 @@ public class UpdateSettingsCommandHandler : IRequestHandler<UpdateSettingsComman
             settings.StartWorkerOnBoot = request.Settings.StartWorkerOnBoot;
             await con.UpdateAsync(settings);
         }
+
         _appState.PathChanged(request.Settings.Path);
         if (!fileExists) return GeneralStatus.Error;
 

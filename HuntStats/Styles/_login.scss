@@ -3,7 +3,7 @@
   width: 100vw;
   height: 100vh;
   z-index: -1;
-  
+
   .background-image {
     position: absolute;
     width: 100vw;
@@ -12,9 +12,10 @@
     background-position: center;
     background-size: cover;
   }
+
   .background-overlay {
     position: absolute;
-    background-color: rgba(0,0,0,.7);
+    background-color: rgba(0, 0, 0, .7);
     width: 100vw;
     height: 100vh;
   }
@@ -24,20 +25,20 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform:translate(-50%, -50%);
-  
+  transform: translate(-50%, -50%);
+
   .login-window {
     background-color: #fff;
     width: 400px;
     padding: 30px;
     border-radius: 10px;
-    
+
     .logo {
       max-height: 110px;
       width: 100%;
       padding: 5px;
     }
-    
+
     .login-header {
       margin: auto;
       text-align: center;

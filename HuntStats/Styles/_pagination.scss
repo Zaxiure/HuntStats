@@ -2,11 +2,11 @@
 .pagination {
   display: inline-block;
   margin-bottom: 0;
-  
+
   li {
     display: inline-block;
   }
-  
+
   .page-link, .page-link:first-child, .page-link:last-child {
     cursor: pointer;
     border: unset;
@@ -17,11 +17,11 @@
     border-radius: 10px;
     border: 2px solid #343740;
     transition: border-color .3s;
-    
+
     &.active {
       border-color: #0a58ca !important;
     }
-    
+
     &:hover {
       border-color: #0a58ca !important;
     }

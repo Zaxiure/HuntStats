@@ -6,7 +6,7 @@
     border: unset;
     background-color: unset;
   }
-  
+
   .right-side {
     margin-left: auto;
   }
@@ -22,12 +22,12 @@
   text-decoration: none;
   transition: background-color .3s;
   border: none;
-  
+
   &:not(.edit):not(.delete):hover {
     background-color: rgb(222, 222, 222);
     color: #000;
   }
-  
+
   &.small {
     position: relative;
     padding: 10px;
@@ -35,20 +35,21 @@
     width: 16px;
     text-align: center;
     box-sizing: content-box;
+
     i {
       position: absolute;
       height: 16px;
       width: 16px;
       text-align: center;
-      top:11px;
+      top: 11px;
       left: 10px;
     }
   }
-  
+
   &.edit {
     background-color: #dbdffd;
   }
-  
+
   &.delete {
     background-color: #fbdae0;
   }

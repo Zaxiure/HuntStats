@@ -15,7 +15,7 @@ public class XpChartQuery : IRequest<List<XpChartInfo>>
     {
         Amount = amount;
     }
-    
+
     public int Amount { get; set; }
 }
 
@@ -36,7 +36,7 @@ public class XpChartQueryHandler : IRequestHandler<XpChartQuery, List<XpChartInf
         var Matches = await _mediator.Send(new GetAllMatchCommand());
         var Settings = await _mediator.Send(new GetSettingsCommand());
         Matches = Matches.OrderByDescending(x => x.DateTime).Take(request.Amount).ToList();
-        
+
         return Matches.Select(async x =>
         {
             var accolades = await _mediator.Send(new GetAccoladesByMatchIdCommand(x.Id));
@@ -49,12 +49,13 @@ public class XpChartQueryHandler : IRequestHandler<XpChartQuery, List<XpChartInf
 
                 if (accolades.FirstOrDefault(x => x.Category == "accolade_extraction") == null) Xp /= 2;
 
-                return new XpChartInfo()
+                return new XpChartInfo
                 {
                     DateTime = x.DateTime,
                     Xp = Xp
                 };
             }
+
             return null;
         }).Select(x => x.Result).Where(x => x != null).OrderBy(x => x.DateTime).ToList();
     }

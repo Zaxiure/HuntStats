@@ -1,8 +1,7 @@
-﻿
-<CascadingValue Value="this">
-    
+﻿<CascadingValue Value="this">
+
     <ul class="nav nav-pills mb-3 " role="group">
-        @foreach (TabPage tabPage in Pages)
+        @foreach (var tabPage in Pages)
         {
             <li class="nav-item">
                 <a href="" @onclick:preventDefault class="nav-link @GetButtonClass(tabPage)" @onclick=@(() => ActivatePage(tabPage))>@tabPage.Text</a>
@@ -19,7 +18,7 @@
 
 
     public TabPage ActivePage { get; set; }
-    List<TabPage> Pages = new();
+    readonly List<TabPage> Pages = new();
 
     internal void AddPage(TabPage tabPage)
     {

@@ -5,9 +5,8 @@ using MediatR;
 
 namespace HuntStats.Features;
 
-
-public class GetAccoladesByMatchIdCommand : IRequest<List<Accolade>> {
-
+public class GetAccoladesByMatchIdCommand : IRequest<List<Accolade>>
+{
     public GetAccoladesByMatchIdCommand(int matchId)
     {
         MatchId = matchId;
@@ -24,6 +23,7 @@ public class GetAccoladesByMatchIdCommandHandler : IRequestHandler<GetAccoladesB
     {
         _connectionFactory = connectionFactory;
     }
+
     public async Task<List<Accolade>> Handle(GetAccoladesByMatchIdCommand request, CancellationToken cancellationToken)
     {
         var con = await _connectionFactory.GetOpenConnectionAsync();

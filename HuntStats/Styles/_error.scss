@@ -1,0 +1,85 @@
+#blazor-error-ui {
+  display: none;
+  position: absolute;
+  border-radius: 15px;
+  padding: 15px;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  text-align: center;
+  height: 100vh;
+
+  .button {
+    cursor: pointer;
+    border: unset !important;
+    background-color: #5B5B65;
+    padding: 15px 30px;
+    border-radius: 10px;
+  }
+
+  a.button {
+    &:hover {
+      text-decoration: unset;
+      color: unset;
+    }
+  }
+
+  h1 {
+    outline: none !important;
+    font-size: 25px;
+    font-weight: 600;
+  }
+  //transform: translate(-50%, -50%);
+  .blazor-error-backdrop {
+    z-index: 999;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,.68);
+  }
+  .blazor-error-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    text-align: left;
+
+    .blazor-inner-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 600px;
+      height: 318px;
+      //padding: 50px;
+      border-radius: 30px;
+      min-width: 500px;
+      background-color: #23252D;
+      //border: 1px solid rgba(0, 192, 154, 0.5);
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+
+      .top {
+        position: relative;
+        padding: 40px;
+        button.dismiss {
+          position: absolute;
+          top: 30px;
+          right: 30px;
+          width: 45px;height:45px;
+          border-radius: 100px;
+          padding:0;
+        }
+      }
+      .center {
+        padding: 0px 40px;
+      }
+      .bottom {
+        padding: 40px;
+      }
+    }
+  }
+}

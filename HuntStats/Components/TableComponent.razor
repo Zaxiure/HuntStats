@@ -1,5 +1,5 @@
-﻿@typeparam TItem
-@using System.Diagnostics.CodeAnalysis
+﻿@using System.Diagnostics.CodeAnalysis
+@typeparam TItem
 
 <div class="table-wrapper">
     <div class="table-responsive">
@@ -43,7 +43,8 @@
     [Parameter]
     public RenderFragment<TItem>? RowTemplate { get; set; }
 
-    [Parameter, AllowNull]
+    [Parameter]
+    [AllowNull]
     public IReadOnlyList<TItem> Items { get; set; }
 
 

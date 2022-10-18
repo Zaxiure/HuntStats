@@ -15,7 +15,7 @@ public class MoneyChartQuery : IRequest<List<MoneyChartInfo>>
     {
         Amount = amount;
     }
-    
+
     public int Amount { get; set; }
 }
 
@@ -36,7 +36,7 @@ public class MoneyChartQueryHandler : IRequestHandler<MoneyChartQuery, List<Mone
         var matches = await _mediator.Send(new GetAllMatchCommand());
         var settings = await _mediator.Send(new GetSettingsCommand());
         matches = matches.OrderByDescending(x => x.DateTime).Take(request.Amount).ToList();
-        
+
         return matches.Select(async x =>
         {
             var accolades = await _mediator.Send(new GetAccoladesByMatchIdCommand(x.Id));
@@ -47,17 +47,15 @@ public class MoneyChartQueryHandler : IRequestHandler<MoneyChartQuery, List<Mone
                 var huntDollars = 0;
                 huntDollars += accolades.Select(x => x.Bounty).Sum();
                 var entry = entries.FirstOrDefault(x => x.Category == "accolade_found_gold");
-                if(entry != null)
-                {
-                    huntDollars += entry.RewardSize;
-                }
-                
-                return new MoneyChartInfo()
+                if (entry != null) huntDollars += entry.RewardSize;
+
+                return new MoneyChartInfo
                 {
                     DateTime = x.DateTime,
                     HuntDollars = huntDollars
                 };
             }
+
             return null;
         }).Select(x => x.Result).Where(x => x != null).OrderBy(x => x.DateTime).ToList();
     }

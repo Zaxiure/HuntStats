@@ -18,10 +18,9 @@ public class KillChartQuery : IRequest<List<KillChartInfo>>
     {
         Amount = amount;
     }
-    
+
     public int Amount { get; set; }
 }
-
 
 public class KillChartQueryHandler : IRequestHandler<KillChartQuery, List<KillChartInfo>>
 {
@@ -40,7 +39,7 @@ public class KillChartQueryHandler : IRequestHandler<KillChartQuery, List<KillCh
         var Matches = await _mediator.Send(new GetAllMatchCommand());
         var Settings = await _mediator.Send(new GetSettingsCommand());
         Matches = Matches.OrderByDescending(x => x.DateTime).Take(request.Amount).ToList();
-        
+
         return Matches.Select(async x =>
         {
             var accolades = await _mediator.Send(new GetAccoladesByMatchIdCommand(x.Id));
@@ -61,6 +60,7 @@ public class KillChartQueryHandler : IRequestHandler<KillChartQuery, List<KillCh
                     Assists = Assists
                 };
             }
+
             return null;
         }).Select(x => x.Result).Where(x => x != null).OrderBy(x => x.DateTime).ToList();
     }

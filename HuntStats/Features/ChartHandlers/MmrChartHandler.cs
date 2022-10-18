@@ -9,13 +9,14 @@ public class ChartInfo
     public int TotalMmr { get; set; }
     public int Mmr { get; set; }
 }
+
 public class MmrChartQuery : IRequest<List<ChartInfo>>
 {
     public MmrChartQuery(int amount)
     {
         Amount = amount;
     }
-    
+
     public int Amount { get; set; }
 }
 
@@ -35,7 +36,7 @@ public class MmrChartQueryHandler : IRequestHandler<MmrChartQuery, List<ChartInf
         var Matches = await _mediator.Send(new GetAllMatchCommand());
         var Settings = await _mediator.Send(new GetSettingsCommand());
         Matches = Matches.OrderByDescending(x => x.DateTime).Take(request.Amount).ToList();
-        
+
         return Matches.Select(x =>
         {
             var team = x.Teams.FirstOrDefault(x => x.Players.FirstOrDefault(y => y.ProfileId == Settings.PlayerProfileId) != null);
@@ -50,6 +51,7 @@ public class MmrChartQueryHandler : IRequestHandler<MmrChartQuery, List<ChartInf
                     Mmr = mmr
                 };
             }
+
             return null;
         }).Where(x => x != null).OrderBy(x => x.DateTime).ToList();
     }

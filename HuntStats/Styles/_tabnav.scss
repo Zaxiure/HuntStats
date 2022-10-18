@@ -1,37 +1,39 @@
 .card .nav-pills {
-    margin-bottom: 25px !important;
-    padding-top: 10px;
-    //margin-left: 15px;
-    //margin-right: 15px;
-    margin-top: -20px;
-    border-bottom: 2px #ebebeb solid;
-}
-.card .nav-pills .nav-item .nav-link {
-    color: #707070;
-    font-size: 16px;
-    font-weight: bolder;
-    margin-bottom: -2px;
-    border-radius: unset !important;
-    margin-right: 0 !important;
-}
-.card .nav-pills .nav-item .nav-link.active {
-    background: transparent !important;
-    border-bottom: 2px #000 solid;
-}
-.card .nav-pills .nav-item .nav-link:not(.active):hover {
-    color: #707070 !important;
-    border-bottom: 2px #707070 solid;
-    background: transparent !important;
+  margin-bottom: 25px !important;
+  padding-top: 10px;
+  //margin-left: 15px;
+  //margin-right: 15px;
+  margin-top: -20px;
+  border-bottom: 2px #ebebeb solid;
 }
 
+.card .nav-pills .nav-item .nav-link {
+  color: #707070;
+  font-size: 16px;
+  font-weight: bolder;
+  margin-bottom: -2px;
+  border-radius: unset !important;
+  margin-right: 0 !important;
+}
+
+.card .nav-pills .nav-item .nav-link.active {
+  background: transparent !important;
+  border-bottom: 2px #000 solid;
+}
+
+.card .nav-pills .nav-item .nav-link:not(.active):hover {
+  color: #707070 !important;
+  border-bottom: 2px #707070 solid;
+  background: transparent !important;
+}
 
 
 .modal-dialog {
-    max-width: 75vw !important;
-    width: unset !important;
-    min-width: 500px !important;
-    
-    pre {
-        max-height: 75vh;
-    }
+  max-width: 75vw !important;
+  width: unset !important;
+  min-width: 500px !important;
+
+  pre {
+    max-height: 75vh;
+  }
 }

@@ -1,0 +1,44 @@
+html, body {
+  background-color: #1D1F26;
+}
+
+.page-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: #1D1F26;
+  color: #fff;
+  transition: opacity 0.3s;
+}
+.page-loading.hide {
+  opacity: 0;
+}
+.page-loading .page-loading-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+.page-loading .page-loading-container .page-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.page-loading .page-loading-container .page-center h1 {
+  color: #fff;
+}
+.page-loading .page-loading-container .page-center .loader svg {
+  display: block;
+  margin: auto;
+  margin-top: 25px;
+  transform: scale(2) translateZ(0);
+  will-change: transform;
+}
+
+.blazor-error-ui {
+  display: none;
+}
+
+/*# sourceMappingURL=loading.css.map */

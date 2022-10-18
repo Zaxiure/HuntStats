@@ -1,0 +1,83 @@
+.sidebar-placeholder {
+  width: $sidebar-width;
+  flex-shrink: 0;
+}
+
+.sidebar {
+  position: fixed;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  width: $sidebar-width;
+  font-family: "roobert",-apple-system,BlinkMacSystemFont,Arial,Roboto,Ubuntu,Helvetica Neue,sans-serif;
+
+  .top-menu {
+    height: $header-size;
+    font-size: 35px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 94px;
+    padding-left: 37px;
+  }
+
+  .bottom-menu {
+    background-color: #272A31;
+    border-top-right-radius: 40px;
+    flex: 1 1 auto;
+
+
+    .nav-item {
+      font-size: 22px;
+      font-weight: 600;
+      padding: 0 !important;
+
+      &.server, &.sub-text {
+        padding: 5px 37px !important;
+      }
+
+      &:hover .nav-link {
+        color: #9146FF !important;
+      }
+
+      .nav-link {
+        position: relative;
+        padding: 5px 37px !important;
+        color: #fff;
+        transition: color .3s, border-left 1s;
+        //border-left: 2px solid rgba(0,0,0,0);
+        &:before {
+          content: '';
+          width: 2px;
+          height: 21px;
+          left: 0;
+          top: 14px;
+          border-top-right-radius: 3px;
+          border-bottom-right-radius: 3px;
+          position: absolute;
+          transition: background-color .3s;
+          background-color: rgba(0, 0, 0, 0);
+        }
+
+        &.active {
+          color: #9146FF;
+          //border-left: 2px solid #9146FF;
+
+          &:before {
+            background-color: #9146FF;
+          }
+        }
+      }
+    }
+
+    .nav-item.sub-text {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .nav-item.server {
+      font-size: 25px;
+      padding-top: 30px !important;
+      padding-bottom: 40px !important;
+    }
+  }
+}

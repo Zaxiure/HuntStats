@@ -1,17 +1,18 @@
 .calendar {
   max-width: 308px;
 }
+
 .cal-buttons {
   display: flex;
   justify-content: space-between;
   padding: 5px;
   border: 2px solid #ebebeb;
   border-radius: 10px;
-  
+
   .cal-button {
     border-radius: 10px;
     padding: 5px 10px;
-    
+
     &:hover {
       background-color: #ebebeb;
     }
@@ -24,7 +25,7 @@
   //justify-content: space-evenly;
   border-bottom: 1px solid #ebebeb;
   margin-top: 15px;
-  
+
   .cal-item {
     display: inline-block;
     text-align: center;
@@ -45,7 +46,7 @@
   .cal-row {
     //display: flex;
     //flex-direction: row;
-    
+
     .cal-item {
       display: inline-block;
       text-align: center;
@@ -54,21 +55,22 @@
       padding: 7px;
       margin: 3px;
       border-radius: 10px;
-      cursor:pointer;
+      cursor: pointer;
       //transition: .3s background-color;
-      
+
       &.active {
         background-color: #ebebeb;
       }
-      
+
       &.inactive {
-        color: rgba(0,0,0,0.4);
+        color: rgba(0, 0, 0, 0.4);
       }
-      
+
       &:hover {
         background-color: #ebebeb;
       }
     }
+
     //justify-content: space-evenly;
   }
 }

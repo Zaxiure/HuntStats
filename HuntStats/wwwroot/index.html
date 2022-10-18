@@ -13,72 +13,123 @@
 <!--	<script src="js/chartjs-plugin-annotation.min.js"></script>-->
 </head>
 
-<body>
+<body style="background-color:#000">
 
-	<div class="status-bar-safe-area"></div>
+<div id="app">
+</div>
+<div class="page-loading">
+    <div class="page-loading-container">
+        <div class="page-center">
+            <div class="loader loader--style5" title="4">
+                <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                     width="24px" height="30px" top="0" left="0" viewBox="0 0 24 30" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+                        <rect x="0" y="0" width="4" height="10" fill="#fff">
+                          <animateTransform attributeType="xml"
+                                            attributeName="transform" type="translate"
+                                            values="0 0; 0 20; 0 0"
+                                            begin="0" dur="0.6s" repeatCount="indefinite" />
+                        </rect>
+                    <rect x="10" y="0" width="4" height="10" fill="#fff">
+                          <animateTransform attributeType="xml"
+                                            attributeName="transform" type="translate"
+                                            values="0 0; 0 20; 0 0"
+                                            begin="0.2s" dur="0.6s" repeatCount="indefinite" />
+                        </rect>
+                    <rect x="20" y="0" width="4" height="10" fill="#fff">
+                      <animateTransform attributeType="xml"
+                                        attributeName="transform" type="translate"
+                                        values="0 0; 0 20; 0 0"
+                                        begin="0.4s" dur="0.6s" repeatCount="indefinite" />
+                    </rect>
+                  </svg>
+            </div>
+        </div>
+    </div>
+</div>
 
-	<div id="app">Loading...</div>
+<div id="blazor-error-ui">
+    <div class="blazor-error-container">
+        <div class="blazor-inner-container">
+            <div class="top">
+                <h1>Big oof</h1>
+                <button class="dismiss button"></button>
+            </div>
+            <div class="center">
+                <p style="font-size:18px;">Something went wrong</p>
+            </div>
+            <div class="bottom">
+                <a style="background-color: #6A67FC;margin-right:15px;" id="reload" class="reload button">Reload</a>
+                <a class="button dismiss">Dismiss</a>
+            </div>
+        </div>
+    </div>
+    <div class="blazor-error-backdrop dismiss"></div>
+</div>
 
-	<div id="blazor-error-ui">
-		An unhandled error has occurred.
-		<a href="" class="reload">Reload</a>
-		<a class="dismiss">🗙</a>
-	</div>
-	<script>
-		var charts = [];
-		var testobject;
-		
-		window.getWidth = () => {
-			return window.innerWidth
-		}
+<script>
+    var charts = [];
+    var testobject;
 
-		window.resetChart = (el) => {
-			var chartToRefresh = charts.filter(x => x.canvas == el)[0];
-			if(chartToRefresh !== undefined) {
-				chartToRefresh.destroy();
-				charts.splice(charts.indexOf(chartToRefresh), 1);
-			}
-		}
-		
-		window.resetCharts = () => {
-			charts.forEach(x => {
-				if(x !== undefined) {
-					if(x.destroy !== undefined) {
-						x.destroy();
-					}
-				}
-			})
-			charts = [];
-		}
-		
-		window.createChart = (chartElement, data) => {
-			charts = [...charts, new Chart(chartElement, {
-				type: "line",
-				data: data,
-				options: {
-					responsive:true,
-					maintainAspectRatio: false,
-					scales: {
-						y: {
-							suggestedMax: 10,
-						}
-					}
-					// suggestedMax: 10
-				}
-			})]
-		}
+    window.RemoveLoading = function() {
+        setTimeout(() => {
+            $('.page-loading').addClass("hide");
+            setTimeout(() => {
+                $('.page-loading').remove();
+            }, 300)
+        }, 1000)
+    }
+    
+    window.getWidth = () => {
+        return window.innerWidth
+    }
 
-		window.createPieChart = (chartElement, data) => {
-			console.log(data);
-			charts = [...charts, new Chart(chartElement, {
-				type: "pie",
-				data: data,
-				options: {
-					responsive:true,
-					maintainAspectRatio: false,
-				}
-			})]
-		}
+    window.resetChart = (el) => {
+        var chartToRefresh = charts.filter(x => x.canvas == el)[0];
+        if (chartToRefresh !== undefined) {
+            chartToRefresh.destroy();
+            charts.splice(charts.indexOf(chartToRefresh), 1);
+        }
+    }
+
+    window.resetCharts = () => {
+        charts.forEach(x => {
+            if (x !== undefined) {
+                if (x.destroy !== undefined) {
+                    x.destroy();
+                }
+            }
+        })
+        charts = [];
+    }
+
+    window.createChart = (chartElement, data) => {
+        charts = [...charts, new Chart(chartElement, {
+            type: "line",
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        suggestedMax: 10,
+                    }
+                }
+                // suggestedMax: 10
+            }
+        })]
+    }
+
+    window.createPieChart = (chartElement, data) => {
+        console.log(data);
+        charts = [...charts, new Chart(chartElement, {
+            type: "pie",
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        })]
+    }
 
 		window.createDropdown = (clickElement, dropdownElement) => {
 			let dropdown = Popper.createPopper(clickElement, dropdownElement, {
@@ -86,10 +137,10 @@
 				modifiers: [{
 					name: 'preventOverflow',
 					options: {
-						rootBoundary: 'document',
-						altAxis: true,
-						mainAxis: false,
-						tether: false,
+						//rootBoundary: 'document',
+						//altAxis: true,
+						//mainAxis: false,
+						//tether: false,
 						// padding: 15
 					}
 				}],
@@ -101,25 +152,24 @@
 		}
 	</script>
 
-	<script>
-		window.getWidth = () => {
-			return window.innerWidth
-		}
+<script>
+    window.getWidth = () => {
+        return window.innerWidth
+    }
 
-		// window.createDropdown = (clickElement, dropdownElement) => {
-		// 	let dropdown = Popper.createPopper(clickElement, dropdownElement, {
-		//		
-		// 	})
-		// 	setTimeout(() => {
-		// 		dropdown.update();
-		// 	}, 100)
-		// }
-	</script>
+    // window.createDropdown = (clickElement, dropdownElement) => {
+    // 	let dropdown = Popper.createPopper(clickElement, dropdownElement, {
+    //		
+    // 	})
+    // 	setTimeout(() => {
+    // 		dropdown.update();
+    // 	}, 100)
+    // }
+</script>
 
 	<script>
 		window.setScrollLock = (state) => {
 
-			``
 			if (state == false) {
 				document.body.className = ""
 			} else {

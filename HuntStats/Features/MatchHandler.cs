@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Dapper;
+﻿using Dapper;
 using Dommel;
 using HuntStats.Data;
 using HuntStats.Models;
@@ -21,9 +20,9 @@ public class RemoveMatchByIdCommand : IRequest<GeneralStatus>
 
 public class RemoveMatchByIdCommandHandler : IRequestHandler<RemoveMatchByIdCommand, GeneralStatus>
 {
+    private readonly AppState _appState;
     private readonly IDbConnectionFactory _connectionFactory;
     private readonly IMediator _mediator;
-    private readonly AppState _appState;
 
     public RemoveMatchByIdCommandHandler(IDbConnectionFactory connectionFactory, IMediator mediator, AppState appState)
     {
@@ -35,10 +34,10 @@ public class RemoveMatchByIdCommandHandler : IRequestHandler<RemoveMatchByIdComm
     public async Task<GeneralStatus> Handle(RemoveMatchByIdCommand request, CancellationToken cancellationToken)
     {
         using var con = await _connectionFactory.GetOpenConnectionAsync();
-        await con.QueryAsync("DELETE FROM Match WHERE Id = @MatchId", new { MatchId = request.MatchId });
-        await con.QueryAsync("DELETE FROM Entries WHERE MatchId = @MatchId", new { MatchId = request.MatchId });
-        await con.QueryAsync("DELETE FROM Accolades WHERE MatchId = @MatchId", new { MatchId = request.MatchId });
-        await con.QueryAsync("DELETE FROM Teams WHERE MatchId = @MatchId", new { MatchId = request.MatchId });
+        await con.QueryAsync("DELETE FROM Match WHERE Id = @MatchId", new { request.MatchId });
+        await con.QueryAsync("DELETE FROM Entries WHERE MatchId = @MatchId", new { request.MatchId });
+        await con.QueryAsync("DELETE FROM Accolades WHERE MatchId = @MatchId", new { request.MatchId });
+        await con.QueryAsync("DELETE FROM Teams WHERE MatchId = @MatchId", new { request.MatchId });
         _appState.MatchAdded();
         return GeneralStatus.Succes;
     }
@@ -53,6 +52,7 @@ public class GetMatchbyIdCommand : IRequest<HuntMatch>
 
     public int Id { get; set; }
 }
+
 public class GetMatchbyIdCommandHandler : IRequestHandler<GetMatchbyIdCommand, HuntMatch>
 {
     private readonly IDbConnectionFactory _connectionFactory;
@@ -72,7 +72,7 @@ public class GetMatchbyIdCommandHandler : IRequestHandler<GetMatchbyIdCommand, H
         var mappedHuntMatch = match.Select(async x =>
         {
             var teams = await con.SelectAsync<TeamTable>(j => j.MatchId == x.Id);
-            var huntMatch = new HuntMatch()
+            var huntMatch = new HuntMatch
             {
                 Id = x.Id,
                 DateTime = x.DateTime,
@@ -80,7 +80,7 @@ public class GetMatchbyIdCommandHandler : IRequestHandler<GetMatchbyIdCommand, H
                 Assassin = x.Assassin,
                 Butcher = x.Butcher,
                 Scrapbeak = x.Scrapbeak,
-                Teams = teams.Select(team => new Team()
+                Teams = teams.Select(team => new Team
                 {
                     Id = team.Id,
                     Mmr = team.Mmr,
@@ -110,12 +110,12 @@ public class MatchView
 public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, MatchView>
 {
     private readonly IDbConnectionFactory _connectionFactory;
-    
+
     public GetMatchCommandHandler(IDbConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
     }
-    
+
     public async Task<MatchView> Handle(GetMatchCommand request, CancellationToken cancellationToken)
     {
         using var con = await _connectionFactory.GetOpenConnectionAsync();
@@ -127,7 +127,7 @@ public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, MatchView
             var teams = await con.SelectAsync<TeamTable>(j => j.MatchId == x.Id);
             var accolades = await con.SelectAsync<Accolade>(j => j.MatchId == x.Id);
             var entries = await con.SelectAsync<HuntEntry>(j => j.MatchId == x.Id);
-            var huntMatch = new HuntMatch()
+            var huntMatch = new HuntMatch
             {
                 Id = x.Id,
                 DateTime = x.DateTime,
@@ -137,7 +137,7 @@ public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, MatchView
                 Scrapbeak = x.Scrapbeak,
                 Assassin = x.Assassin,
                 Butcher = x.Butcher,
-                Teams = teams.Select(team => new Team()
+                Teams = teams.Select(team => new Team
                 {
                     Id = team.Id,
                     Mmr = team.Mmr,
@@ -152,17 +152,19 @@ public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, MatchView
 
             return huntMatch;
         }).Select(x => x.Result);
-        
-        if(request.OrderType == OrderType.Descending) return new MatchView()
-        {
-            Total = mappedHuntMatch.Count(),
-            Matches = mappedHuntMatch.OrderByDescending(x => x.DateTime).Skip((request.Page-1) * request.PageSize).Take(request.PageSize).ToList()
-        };
-        if(request.OrderType == OrderType.Ascending) return new MatchView()
-        {
-            Total = mappedHuntMatch.Count(),
-            Matches = mappedHuntMatch.OrderBy(x => x.DateTime).Skip((request.Page-1) * request.PageSize).Take(request.PageSize).ToList()
-        };
+
+        if (request.OrderType == OrderType.Descending)
+            return new MatchView
+            {
+                Total = mappedHuntMatch.Count(),
+                Matches = mappedHuntMatch.OrderByDescending(x => x.DateTime).Skip((request.Page - 1) * request.PageSize).Take(request.PageSize).ToList()
+            };
+        if (request.OrderType == OrderType.Ascending)
+            return new MatchView
+            {
+                Total = mappedHuntMatch.Count(),
+                Matches = mappedHuntMatch.OrderBy(x => x.DateTime).Skip((request.Page - 1) * request.PageSize).Take(request.PageSize).ToList()
+            };
         return null;
     }
 }
@@ -171,15 +173,16 @@ public class GetAllMatchCommand : IRequest<List<HuntMatch>>
 {
     public OrderType OrderType { get; set; } = OrderType.Descending;
 }
+
 public class GetAllMatchCommandHandler : IRequestHandler<GetAllMatchCommand, List<HuntMatch>>
 {
     private readonly IDbConnectionFactory _connectionFactory;
-    
+
     public GetAllMatchCommandHandler(IDbConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
     }
-    
+
     public async Task<List<HuntMatch>> Handle(GetAllMatchCommand request, CancellationToken cancellationToken)
     {
         using var con = await _connectionFactory.GetOpenConnectionAsync();
@@ -189,7 +192,7 @@ public class GetAllMatchCommandHandler : IRequestHandler<GetAllMatchCommand, Lis
         var mappedHuntMatch = matches.Select(async x =>
         {
             var teams = await con.SelectAsync<TeamTable>(j => j.MatchId == x.Id);
-            var huntMatch = new HuntMatch()
+            var huntMatch = new HuntMatch
             {
                 Id = x.Id,
                 DateTime = x.DateTime,
@@ -197,7 +200,7 @@ public class GetAllMatchCommandHandler : IRequestHandler<GetAllMatchCommand, Lis
                 Assassin = x.Assassin,
                 Butcher = x.Butcher,
                 Spider = x.Spider,
-                Teams = teams.Select(team => new Team()
+                Teams = teams.Select(team => new Team
                 {
                     Id = team.Id,
                     Mmr = team.Mmr,

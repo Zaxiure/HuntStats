@@ -12,6 +12,7 @@
   overflow: hidden;
   border: 2px solid #373b3e;
   border-radius: 15px;
+
   table {
     margin: 0 !important;
     border-style: none !important;
@@ -24,7 +25,7 @@
   border: 2px solid #373b3e;
   border-radius: 10px;
   margin-bottom: 10px;
-  
+
   table {
     margin: 0 !important;
     border-style: none !important;
@@ -52,7 +53,7 @@ table.data-table tr, table.data-table td {
   border: 1px solid #373b3e
 }
 
-.table.data-table>:not(caption)>*>* {
+.table.data-table > :not(caption) > * > * {
   border-bottom-width: 0 !important;
 }
 

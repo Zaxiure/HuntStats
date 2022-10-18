@@ -1,0 +1,50 @@
+.form-control:focus {
+  border-color: inherit;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.form-control, .form-control:disabled, .form-control:read-only {
+  background-color: #23252D !important;
+  border-color: #585C67 !important;
+  border-radius: 2px;
+  color: #fff !important;
+  outline: none !important;
+  cursor: pointer;
+}
+
+.no-margin {
+  margin: 0 !important;
+}
+
+.form-multiple-group {
+  border: 1px solid #585C67;
+  padding: 15px;
+  padding-bottom: unset;
+  border-radius: 2px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  
+  .form-multiple-row {
+    padding: 0px 10px;
+  }
+  
+  .form-multiple-row:not(:last-of-type) {
+    border-bottom: 2px solid #585C67;
+    margin-bottom: 1rem;
+  }
+}
+
+.form-control:not(:read-only):focus {
+  background-color: unset !important;
+  border-color: unset !important;
+  color: #fff !important;
+  outline: none !important;
+  //box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%);
+  box-shadow: 0 0 0 0.2rem rgb(35, 37, 45, 0.25);
+}
+
+.form-control:focus-visible {
+  outline: unset !important;
+}
+

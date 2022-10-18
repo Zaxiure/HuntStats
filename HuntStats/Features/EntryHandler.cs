@@ -5,8 +5,8 @@ using MediatR;
 
 namespace HuntStats.Features;
 
-public class GetEntriesByMatchIdCommand : IRequest<List<HuntEntry>> {
-
+public class GetEntriesByMatchIdCommand : IRequest<List<HuntEntry>>
+{
     public GetEntriesByMatchIdCommand(int matchId)
     {
         MatchId = matchId;
@@ -23,6 +23,7 @@ public class GetEntriesByMatchIdCommandHandler : IRequestHandler<GetEntriesByMat
     {
         _connectionFactory = connectionFactory;
     }
+
     public async Task<List<HuntEntry>> Handle(GetEntriesByMatchIdCommand request, CancellationToken cancellationToken)
     {
         var con = await _connectionFactory.GetOpenConnectionAsync();

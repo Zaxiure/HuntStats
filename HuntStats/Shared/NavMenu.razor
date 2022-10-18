@@ -2,110 +2,35 @@
 @inject IJSRuntime _js
 @inject AppState _appState
 
-<a class="full-image" style="text-decoration: none !important" href="/" tabindex="-1">
-    <h2 style="text-align: center;color: #fff;">HuntStats</h2>
-    @* <img src="/images/logo.png" alt="" style="max-height: 83px;width:unset !important;display: block;margin: auto;"> *@
-</a>
-<a class="small-image" style="text-decoration: none !important" href="/" tabindex="-1">
-    <h2 style="text-align: center;color: #fff;">H</h2>
-    @* <img src="/images/logo-klein.png" alt="" style="height:46px;"> *@
-</a>
-
-<div class="nav-items">
-    <NavLink @onclick="CloseIfMobile" class="nav-item" href="/" Match="NavLinkMatch.All">
-        <i class="fal fa-chart-line fa-fw"></i>
-        <div class="nav-text">Dashboard</div>
-    </NavLink>
-    <NavLink @onclick="CloseIfMobile" class="nav-item" href="/match" Match="NavLinkMatch.Prefix">
-        <i class="fal fa-bow-arrow fa-fw"></i>
-        <div class="nav-text">Matches</div>
-    </NavLink>
-    <NavLink @onclick="CloseIfMobile" class="nav-item" href="/settings" Match="NavLinkMatch.All">
-        <i class="fal fa-cogs fa-fw"></i>
-        <div class="nav-text">Settings</div>
-    </NavLink>
-</div>
-<div class="nav-items nav-bottom">
-    @* <a class="nav-item @(page == "accountsettings" ? "active" : "")" href="/Accounts/Settings/"> *@
-    @*     <i class="far fa-building"></i> *@
-    @*     <div class="nav-text" title="@User.GetCompanyName()">@User.GetCompanyName()</div> *@
-    @* </a> *@
-</div>
-
-
-@* <div class="sidebar @(NavMenuCssClass)"> *@
-@*     <div class="sidebar-wrapper"> *@
-@*         <div> *@
-@*             <h3> *@
-@*                 <img style="width:150px" src="/images/logo.png" alt=""/> *@
-@*             </h3> *@
-@*             <nav class="flex-column"> *@
-@*                 <div class="nav-item px-3"> *@
-@*                     <NavLink class="nav-link" @onclick="CloseIfMobile" href="" Match="NavLinkMatch.All"> *@
-@*                         <span class="fas fa-fw fa-home nav-icon"></span>  *@
-@*                         <span class="nav-text">Home</span> *@
-@*                     </NavLink> *@
-@*                 </div> *@
-@*                 <div class="nav-item px-3"> *@
-@*                     <NavLink class="nav-link" @onclick="CloseIfMobile" href="/users"> *@
-@*                         <span class="fas fa-fw fa-plus fa-user"></span>  *@
-@*                         <span class="nav-text">Users</span> *@
-@*                     </NavLink> *@
-@*                 </div> *@
-@*             </nav> *@
-@*         </div> *@
-@*         <div class="sidebar-toggle" @onclick="() => ToggleNavMenu()"> *@
-@*             @if (CollapseNavMenu) *@
-@*             { *@
-@*                 <span class="fa-solid fa-chevron-right"></span> *@
-@*             } *@
-@*             else *@
-@*             { *@
-@*                 <span class="fa-solid fa-chevron-left"></span> *@
-@*             } *@
-@*         </div> *@
-@*     </div> *@
-@* </div> *@
-
-<div @onclick="() => ToggleNavMenu()" class="sidebar-mobile-backdrop">
-
+<div>
+    <nav class="flex-column">
+        <div class="nav-item sub-text mt-4">
+            GENERAL
+        </div>
+        <div class="nav-item">
+            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+                <i class="fal fa-chart-line fa-fw"></i>
+                Dashboard
+            </NavLink>
+        </div>
+        <div class="nav-item">
+            <NavLink class="nav-link" href="/match" Match="NavLinkMatch.Prefix">
+                <i class="fal fa-bow-arrow fa-fw"></i>
+                Matches
+            </NavLink>
+        </div>
+        <div class="nav-item">
+            <NavLink class="nav-link" href="/settings" Match="NavLinkMatch.All">
+                <i class="fal fa-cogs fa-fw"></i>
+                Settings
+            </NavLink>
+        </div>
+    </nav>
 </div>
 
 @code {
 
     [Parameter]
     public EventCallback<bool> NavMenuChange { get; set; }
-
-    public bool CollapseNavMenu = false;
-
-    private string? NavMenuCssClass
-    {
-        get => CollapseNavMenu ? "closed" : null;
-    }
-
-    private async Task CloseIfMobile()
-    {
-        var clientWidth = await _js.InvokeAsync<int>("getWidth");
-        if (clientWidth < 768)
-        {
-    // CollapseNavMenu = !CollapseNavMenu;
-            _appState.CloseSidebar();
-            await ToggleNavMenu(true);
-            await _js.InvokeAsync<int>("setScrollLock", CollapseNavMenu);
-        }
-    }
-
-    public bool GetNavState()
-    {
-        return CollapseNavMenu;
-    }
-
-    public async Task ToggleNavMenu(bool shouldUpdate = false)
-    {
-        CollapseNavMenu = !CollapseNavMenu;
-        await _js.InvokeAsync<int>("setScrollLock", CollapseNavMenu);
-        await NavMenuChange.InvokeAsync(CollapseNavMenu);
-        if (shouldUpdate) StateHasChanged();
-    }
 
 }

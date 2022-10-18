@@ -4,8 +4,8 @@
   flex-direction: column;
   //padding: 15px;
   margin: 15px;
-  
-  
+
+
   .team-player {
     padding: 5px 15px;
     margin-bottom: 15px;
@@ -15,16 +15,16 @@
     text-overflow: ellipsis;
     //border-top: 1px solid #343740;
   }
-  
+
   .btn.team-player:hover {
-    border-color:#0a58ca;
+    border-color: #0a58ca;
   }
-  
+
   .team-player:last-of-type {
     border-right: 1px solid #343740;
   }
-  
-  
+
+
 }
 
 .btn-primary:disabled {
@@ -48,7 +48,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-evenly;
-  
+
   & > div {
     flex-shrink: 0;
     margin-bottom: 5px;
