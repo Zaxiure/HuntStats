@@ -18,8 +18,29 @@
 @inject IJSRuntime JS
 
 <div class="card-container" style="margin:  auto;">
-    <h3>Statistics</h3>
-    <div class="chart-container d-flex flex-xl-row flex-column">
+    <h5>Overall Statistics</h5>
+    <div class="d-flex flex-row justify-content-between mt-2 mb-3">
+        <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+            Total Kills: @Totals.Kills
+        </div>
+        <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+            Your kills: @Totals.YourKills
+        </div>
+        <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+            Assists: @Totals.Assists
+        </div>
+        <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+            KD: @(((double)Totals.YourKills / Totals.Deaths).ToString("#.##").Replace("NaN", "0"))
+        </div>
+        <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+            KDA: @(((double)(Totals.YourKills + Totals.Assists) / Totals.Deaths).ToString("#.##").Replace("NaN", "0"))
+        </div>
+        <div class="stats" style="padding: 10px 15px; border: 2px solid #343740;border-radius: 15px;">
+            Deaths: @Totals.Deaths
+        </div>
+    </div>
+    <h5>Graphical statistics</h5>
+    <div class="chart-container d-flex flex-xl-row flex-column mt-2">
         <div class="card col position-relative me-xl-2" style="max-height: 750px;">
             <div class="card-body">
                 <DropdownSelect TValue="int" SearchDisabled="true" ValueChanged="HandleKillChartChange" Value="KillChartAmount" ListItems="ListItems"></DropdownSelect>
@@ -140,6 +161,7 @@
     private ElementReference _xpChart;
     private ElementReference _bossChart;
 
+    public TotalView Totals { get; set; } = new();
     public int MmrChartAmount { get; set; } = 25;
     public int MoneyChartAmount { get; set; } = 25;
     public int KillChartAmount { get; set; } = 25;
@@ -247,6 +269,12 @@
         await FetchMoneyChart(reset);
         await FetchXpChart(reset);
         await FetchBossChart(reset);
+        await FetchTotals();
+    }
+
+    public async Task FetchTotals()
+    {
+        Totals = await Mediator.Send(new GetTotalsCommand());
     }
     
     public async Task FetchBossChart(bool reset = false)
