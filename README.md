@@ -28,9 +28,9 @@ Finally to build the project you need to run the following command in the root d
 `dotnet publish -f net6.0-windows10.0.19041.0 -c Release -p:WindowsPackageType=None`
 
 ## Preview of the application
-![Statistics Dashboard](https://user-images.githubusercontent.com/8901040/194701514-0c4dce81-35e1-4dda-a9bb-7c230df8fcf8.png)
-![Matches Screen](https://user-images.githubusercontent.com/8901040/194701522-d4808a9f-3db5-42cb-8b56-02dbcba81785.png)
-![Match Screen](https://user-images.githubusercontent.com/8901040/194701569-1c6c8744-f37f-4347-a470-863fa277a8cc.png)
+![Dashboard](https://user-images.githubusercontent.com/8901040/197850095-39d05928-4422-4bfa-b670-a48770831dfa.png)
+![Matches Screen](https://user-images.githubusercontent.com/8901040/197849817-a1ef4764-ff67-4700-93b9-d8c96962f914.png)
+![Match Screen](https://user-images.githubusercontent.com/8901040/197850046-ac46911c-1523-414c-9af9-4741d7328798.png)
 ![Settings Screen](https://user-images.githubusercontent.com/8901040/194701552-561a3f07-117d-4775-9e1c-c1f89bc4ee2d.png)
 
 ## Usage showcase
