@@ -279,17 +279,23 @@
                                 }
                                 @foreach (var entry in Entries.Where(x => x.Category == "accolade_players_killed"))
                                 {
-                                    <tr>
-                                        <td>
-                                            Kill @entry.DescriptorName.Split(" ")[4] star player
-                                        </td>
-                                        <td>
-                                            @entry.Amount
-                                        </td>
-                                        <td>
-                                            @entry.RewardSize
-                                        </td>
-                                    </tr>
+                                    if (!entry.DescriptorName.Contains("resurrected"))
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (entry.DescriptorName.Split(" ").Length == 6)
+                                                {
+                                                    @("Kill " + entry.DescriptorName.Split(" ")[4] + " star player")
+                                                }
+                                            </td>
+                                            <td>
+                                                @entry.Amount
+                                            </td>
+                                            <td>
+                                                @entry.RewardSize
+                                            </td>
+                                        </tr>
+                                    }
                                 }
                                 @foreach (var entry in RemainingEntries)
                                 {
