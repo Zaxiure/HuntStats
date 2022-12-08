@@ -38,16 +38,20 @@ public class BossChartQueryHandler : IRequestHandler<BossChartQuery, BossChartIn
     public async Task<BossChartInfo> Handle(BossChartQuery request, CancellationToken cancellationToken)
     {
         using var con = await _connectionFactory.GetOpenConnectionAsync();
-        var Matches = await _mediator.Send(new GetAllMatchCommand());
+        var huntMatch = await _mediator.Send(new GetMatchCommand()
+        {
+            OrderType = OrderType.Descending,
+            Page = 0,
+            PageSize = request.Amount
+        });
         var Settings = await _mediator.Send(new GetSettingsCommand());
-        Matches = Matches.OrderByDescending(x => x.DateTime).Take(request.Amount).ToList();
 
         return new BossChartInfo()
         {
-            Scrapbeak = Matches.Select(x => x.Scrapbeak ? 1 : 0).Sum(),
-            Spider = Matches.Select(x => x.Spider ? 1 : 0).Sum(),
-            Assassin = Matches.Select(x => x.Assassin ? 1 : 0).Sum(),
-            Butcher = Matches.Select(x => x.Butcher ? 1 : 0).Sum(),
+            Scrapbeak = huntMatch.Matches.Select(x => x.Scrapbeak ? 1 : 0).Sum(),
+            Spider = huntMatch.Matches.Select(x => x.Spider ? 1 : 0).Sum(),
+            Assassin = huntMatch.Matches.Select(x => x.Assassin ? 1 : 0).Sum(),
+            Butcher = huntMatch.Matches.Select(x => x.Butcher ? 1 : 0).Sum(),
         };
     }
 }

@@ -1,4 +1,5 @@
 using HuntStats.Data;
+using HuntStats.Pages;
 using MediatR;
 
 namespace HuntStats.Features.ChartHandlers;
@@ -37,11 +38,15 @@ public class KillChartQueryHandler : IRequestHandler<KillChartQuery, List<KillCh
     public async Task<List<KillChartInfo>> Handle(KillChartQuery request, CancellationToken cancellationToken)
     {
         using var con = await _connectionFactory.GetOpenConnectionAsync();
-        var Matches = await _mediator.Send(new GetAllMatchCommand());
+        var huntMatch = await _mediator.Send(new GetMatchCommand()
+        {
+            OrderType = OrderType.Descending,
+            Page = 0,
+            PageSize = request.Amount
+        });
         var Settings = await _mediator.Send(new GetSettingsCommand());
-        Matches = Matches.OrderByDescending(x => x.DateTime).Take(request.Amount).ToList();
         
-        return Matches.Select(async x =>
+        return huntMatch.Matches.Select(async x =>
         {
             var accolades = await _mediator.Send(new GetAccoladesByMatchIdCommand(x.Id));
             var team = x.Teams.FirstOrDefault(x => x.Players.FirstOrDefault(y => y.ProfileId == Settings.PlayerProfileId) != null);

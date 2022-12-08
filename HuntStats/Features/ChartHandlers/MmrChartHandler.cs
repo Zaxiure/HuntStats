@@ -32,11 +32,15 @@ public class MmrChartQueryHandler : IRequestHandler<MmrChartQuery, List<ChartInf
 
     public async Task<List<ChartInfo>> Handle(MmrChartQuery request, CancellationToken cancellationToken)
     {
-        var Matches = await _mediator.Send(new GetAllMatchCommand());
+        var huntMatch = await _mediator.Send(new GetMatchCommand()
+        {
+            OrderType = OrderType.Descending,
+            Page = 0,
+            PageSize = request.Amount
+        });
         var Settings = await _mediator.Send(new GetSettingsCommand());
-        Matches = Matches.OrderByDescending(x => x.DateTime).Take(request.Amount).ToList();
         
-        return Matches.Select(x =>
+        return huntMatch.Matches.Select(x =>
         {
             var team = x.Teams.FirstOrDefault(x => x.Players.FirstOrDefault(y => y.ProfileId == Settings.PlayerProfileId) != null);
             if (team != null)

@@ -33,11 +33,15 @@ public class MoneyChartQueryHandler : IRequestHandler<MoneyChartQuery, List<Mone
     public async Task<List<MoneyChartInfo>> Handle(MoneyChartQuery request, CancellationToken cancellationToken)
     {
         using var con = await _connectionFactory.GetOpenConnectionAsync();
-        var matches = await _mediator.Send(new GetAllMatchCommand());
+        var huntMatch = await _mediator.Send(new GetMatchCommand()
+        {
+            OrderType = OrderType.Descending,
+            Page = 0,
+            PageSize = request.Amount
+        });
         var settings = await _mediator.Send(new GetSettingsCommand());
-        matches = matches.OrderByDescending(x => x.DateTime).Take(request.Amount).ToList();
         
-        return matches.Select(async x =>
+        return huntMatch.Matches.Select(async x =>
         {
             var accolades = await _mediator.Send(new GetAccoladesByMatchIdCommand(x.Id));
             var entries = await _mediator.Send(new GetEntriesByMatchIdCommand(x.Id));
