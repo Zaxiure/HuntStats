@@ -120,7 +120,10 @@ public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, MatchView
     {
         using var con = await _connectionFactory.GetOpenConnectionAsync();
 
-        var matches = await con.GetAllAsync<HuntMatchTable>();
+        // var matches = await con.GetAllAsync<HuntMatchTable>();
+
+        var matchCount = await con.QueryFirstAsync<int>("SELECT COUNT(*) FROM Match");
+        var matches = await con.QueryAsync<HuntMatchTable>("SELECT * FROM Match ORDER BY DateTime " + ( request.OrderType == OrderType.Ascending ? "asc" : "desc" ) + " LIMIT " + request.PageSize + " OFFSET " + ( ( request.Page-1 ) * request.PageSize ));
 
         var mappedHuntMatch = matches.Select(async x =>
         {
@@ -155,13 +158,13 @@ public class GetMatchCommandHandler : IRequestHandler<GetMatchCommand, MatchView
         
         if(request.OrderType == OrderType.Descending) return new MatchView()
         {
-            Total = mappedHuntMatch.Count(),
-            Matches = mappedHuntMatch.OrderByDescending(x => x.DateTime).Skip((request.Page-1) * request.PageSize).Take(request.PageSize).ToList()
+            Total = matchCount,
+            Matches = mappedHuntMatch.OrderByDescending(x => x.DateTime).ToList()
         };
         if(request.OrderType == OrderType.Ascending) return new MatchView()
         {
-            Total = mappedHuntMatch.Count(),
-            Matches = mappedHuntMatch.OrderBy(x => x.DateTime).Skip((request.Page-1) * request.PageSize).Take(request.PageSize).ToList()
+            Total = matchCount,
+            Matches = mappedHuntMatch.OrderBy(x => x.DateTime).ToList()
         };
         return null;
     }
