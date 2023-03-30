@@ -27,13 +27,13 @@ The following things are required:
 Finally to build the project you need to run the following command in the root directory of HuntStats  
 `dotnet publish -f net6.0-windows10.0.19041.0 -c Release -p:WindowsPackageType=None`
 
-## Preview of the application
-![Dashboard](https://user-images.githubusercontent.com/8901040/197850095-39d05928-4422-4bfa-b670-a48770831dfa.png)
-![Matches Screen](https://user-images.githubusercontent.com/8901040/197849817-a1ef4764-ff67-4700-93b9-d8c96962f914.png)
-![Match Screen](https://user-images.githubusercontent.com/8901040/197850046-ac46911c-1523-414c-9af9-4741d7328798.png)
-![Settings Screen](https://user-images.githubusercontent.com/8901040/194701552-561a3f07-117d-4775-9e1c-c1f89bc4ee2d.png)
+<!--- ## Preview of the application --->
+<!--- ![Dashboard](https://user-images.githubusercontent.com/8901040/197850095-39d05928-4422-4bfa-b670-a48770831dfa.png) --->
+<!--- ![Matches Screen](https://user-images.githubusercontent.com/8901040/197849817-a1ef4764-ff67-4700-93b9-d8c96962f914.png) --->
+<!--- ![Match Screen](https://user-images.githubusercontent.com/8901040/197850046-ac46911c-1523-414c-9af9-4741d7328798.png) --->
+<!--- ![Settings Screen](https://user-images.githubusercontent.com/8901040/194701552-561a3f07-117d-4775-9e1c-c1f89bc4ee2d.png) --->
 
-## Usage showcase
-![Graphs](https://user-images.githubusercontent.com/8901040/194701835-bd889149-55d2-4448-84ce-c08fc0d2248a.gif)
-![Select Player](https://user-images.githubusercontent.com/8901040/194701784-bf9165fc-ccbc-4593-9ac2-37289e25e8ab.gif)
-![Select Folder](https://user-images.githubusercontent.com/8901040/194701724-2f58485f-40cc-4a06-9282-c964e7c06fcc.gif)
+<!--- ## Usage showcase --->
+<!--- ![Graphs](https://user-images.githubusercontent.com/8901040/194701835-bd889149-55d2-4448-84ce-c08fc0d2248a.gif) --->
+<!---  ![Select Player](https://user-images.githubusercontent.com/8901040/194701784-bf9165fc-ccbc-4593-9ac2-37289e25e8ab.gif) --->
+<!---  ![Select Folder](https://user-images.githubusercontent.com/8901040/194701724-2f58485f-40cc-4a06-9282-c964e7c06fcc.gif) --->
