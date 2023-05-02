@@ -17,8 +17,13 @@ public partial class App : Application
 		if (window != null)
 		{
 			window.Title = "HüntStäts by Zaxiure";
-		}
+			const int DefaultWidth = 1280;
+			const int DefaultHeight = 800;
 
-		return window;
-	}
+			// change window size.
+			window.Width = DefaultWidth;
+			window.Height = DefaultHeight;
+		}
+        return window;
+    }
 }
