@@ -67,6 +67,48 @@
                         <small class="form-text d-block">This is the player you selected as yourself on the matchscreen.</small>
                     </div>
                 </div>
+                <div class="form-group row">
+                    <label for="staticEmail" class="col-sm-4 col-form-label">Nvidia Highlights Temp Folder</label>
+                    <div class="col-sm-8">
+                        <div @onclick="SelectTempFolder" class="btn btn-primary d-block">Select Nvidia Highlights temp folder...</div>
+                        @if (FileNotFound)
+                        {
+                            <small class="form-text">File could not be found, are you sure you selected the right folder?</small>
+                        }
+                        else
+                        {
+                            @if (HuntSettings.HighlightsTempPath == null || HuntSettings.HighlightsTempPath == string.Empty)
+                            {
+                                <small class="form-text">Check settings of Nvidia overlay -> Highlights -> Temporary path</small>
+                            }
+                            else
+                            {
+                                <small class="form-text">Current: @HuntSettings.HighlightsTempPath</small>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="staticEmail" class="col-sm-4 col-form-label">Hunt: Showdown Highlights Output Folder</label>
+                    <div class="col-sm-8">
+                        <div @onclick="SelectOutputFolder" class="btn btn-primary d-block">Select Highlights Output folder...</div>
+                        @if (FileNotFound)
+                        {
+                            <small class="form-text">File could not be found, are you sure you selected the right folder?</small>
+                        }
+                        else
+                        {
+                            @if (HuntSettings.HighlightsOutputPath == null || HuntSettings.HighlightsOutputPath == string.Empty)
+                            {
+                                <small class="form-text">No folder selected yet...</small>
+                            }
+                            else
+                            {
+                                <small class="form-text">Current: @HuntSettings.HighlightsOutputPath</small>
+                            }
+                        }
+                    </div>
+                </div>
             </form>
         </div>
     </div>
@@ -89,6 +131,42 @@
         if (result != null)
         {
             HuntSettings.Path = result;
+            var updateResult = await _mediator.Send(new UpdateSettingsCommand(HuntSettings));
+            if (updateResult == GeneralStatus.Error)
+            {
+                FileNotFound = true;
+            }
+            else
+            {
+                FileNotFound = false;
+            }
+        }
+    }
+
+    public async Task SelectTempFolder()
+    {
+        var result = await _folderPicker.PickFolder();
+        if (result != null)
+        {
+            HuntSettings.HighlightsTempPath = result;
+            var updateResult = await _mediator.Send(new UpdateSettingsCommand(HuntSettings));
+            if (updateResult == GeneralStatus.Error)
+            {
+                FileNotFound = true;
+            }
+            else
+            {
+                FileNotFound = false;
+            }
+        }
+    }
+
+    public async Task SelectOutputFolder()
+    {
+        var result = await _folderPicker.PickFolder();
+        if (result != null)
+        {
+            HuntSettings.HighlightsOutputPath = result;
             var updateResult = await _mediator.Send(new UpdateSettingsCommand(HuntSettings));
             if (updateResult == GeneralStatus.Error)
             {

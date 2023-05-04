@@ -8,6 +8,8 @@ public class AppState
     public event Action CloseSidebarEvent;
 
     public event Action<string> PathChangedEvent;
+    public event Action<string> HighlightsTempPathChangedEvent;
+    public event Action<string> HighlightsOutputPathChangedEvent;
 
     public void CloseSidebar()
     {
@@ -45,6 +47,16 @@ public class AppState
     public void PathChanged(string path)
     {
         PathChangedEvent?.Invoke(path);
+    }
+
+    public void HighlightsTempPathChanged(string path)
+    {
+        HighlightsTempPathChangedEvent?.Invoke(path);
+    }
+
+    public void HighlightsOutputPathChanged(string path)
+    {
+        HighlightsOutputPathChangedEvent?.Invoke(path);
     }
 
     public void OpenedDropdown(string UniqueId)

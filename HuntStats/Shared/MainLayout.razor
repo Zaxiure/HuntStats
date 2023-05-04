@@ -11,6 +11,7 @@
 @inject AppState _appState;
 @inject IDbConnectionFactory _connectionFactory;
 @inject IMediator _mediator
+@using Serilog;
 
 <div class="layout" @onmousedown="_appState.ClickedOutside">
     <div class="sidebar @SidebarClass()">
@@ -61,6 +62,36 @@
                         }
                     }
                 }
+                @if (HighlightsTempPath == null || HighlightsTempPath == string.Empty)
+                {
+                    <button disabled class="btn btn-primary disabled">
+                        Please check ur settings...
+                    </button>
+                }
+                else
+                {
+                    @if (highlightWorker.CancellationPending)
+                    {
+                        <button disabled class="btn btn-primary disabled">
+                            Stopping highlight background worker...
+                        </button>
+                    }
+                    else
+                    {
+                        @if (!highlightWorker.IsBusy)
+                        {
+                            <button @onclick="ToggleHighlightCheck" class="btn btn-primary">
+                                Start highlight background worker
+                            </button>
+                        }
+                        else
+                        {
+                            <button @onclick="ToggleHighlightCheck" class="btn btn-primary">
+                                Stop highlight background worker
+                            </button>
+                        }
+                    }
+                }
             </div>
         </div>
         <div class="container">
@@ -74,7 +105,10 @@
 
 @code {
     private BackgroundWorker worker;
+    private BackgroundWorker highlightWorker;
     public string Path { get; set; }
+    public string HighlightsTempPath { get; set; }
+    public string HighlightsOutputPath { get; set; }
     private bool _navState;
     private string _userMail;
     private Boolean _sidebarClosed = false;
@@ -91,7 +125,7 @@
         _sidebarClosed = !_sidebarClosed;
         StateHasChanged();
     }
-    
+
     public async Task ToggleCheck()
     {
         if (!worker.CancellationPending)
@@ -110,6 +144,24 @@
         // StateHasChanged();
     }
 
+    public async Task ToggleHighlightCheck()
+    {
+        if (!highlightWorker.CancellationPending)
+        {
+            if (highlightWorker.IsBusy)
+            {
+                Debug.WriteLine("Stopping highlight background worker...");
+                highlightWorker.CancelAsync();
+            }
+            else
+            {
+                Debug.WriteLine("Starting highlight background worker...");
+                highlightWorker.RunWorkerAsync();
+            }
+        }
+        // StateHasChanged();
+    }
+
     protected override async Task OnInitializedAsync()
     {
         var appdataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\HuntStats";
@@ -118,13 +170,19 @@
         await _mediator.Send(new InitializeDatabaseCommand());
         _appState.CloseSidebarEvent += ToggleSidebar;
         _appState.PathChangedEvent += AppStateOnPathChangedEvent;
+        _appState.HighlightsTempPathChangedEvent += AppStateOnHighlightsTempPathChangedEvent;
+        _appState.HighlightsOutputPathChangedEvent += AppStateOnHighlightsOutputPathChangedEvent;
         var settings = (await _mediator.Send(new GetSettingsCommand()));
         Path = settings.Path;
+        HighlightsTempPath = settings.HighlightsTempPath;
+        HighlightsOutputPath = settings.HighlightsOutputPath;
         ConstructWorker();
+        ConstructHighlightWorker();
         var con = await _connectionFactory.GetOpenConnectionAsync();
         if (settings.StartWorkerOnBoot)
         {
             worker.RunWorkerAsync();
+            highlightWorker.RunWorkerAsync();
         }
     }
 
@@ -141,12 +199,47 @@
         await InvokeAsync(StateHasChanged);
     }
 
+    private async void AppStateOnHighlightsTempPathChangedEvent(string obj)
+    {
+        HighlightsTempPath = obj;
+        if (highlightWorker != null)
+        {
+            if (!Directory.Exists(HighlightsTempPath))
+            {
+                if (!highlightWorker.CancellationPending && worker.IsBusy) highlightWorker.CancelAsync();
+            }
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async void AppStateOnHighlightsOutputPathChangedEvent(string obj)
+    {
+        HighlightsOutputPath = obj;
+        if (highlightWorker != null)
+        {
+            if (!Directory.Exists(HighlightsOutputPath))
+            {
+                if (!highlightWorker.CancellationPending && worker.IsBusy) highlightWorker.CancelAsync();
+            }
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
     private void ConstructWorker()
     {
         worker = new BackgroundWorker();
         worker.RunWorkerCompleted += WorkerOnRunWorkerCompleted;
         worker.DoWork += WorkerOnDoWork;
         worker.WorkerSupportsCancellation = true;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void ConstructHighlightWorker()
+    {
+        highlightWorker = new BackgroundWorker();
+        highlightWorker.RunWorkerCompleted += HighlightWorkerOnRunWorkerCompleted;
+        highlightWorker.DoWork += HighlightWorkerOnDoWork;
+        highlightWorker.WorkerSupportsCancellation = true;
         InvokeAsync(StateHasChanged);
     }
 
@@ -167,5 +260,25 @@
         }
         Debug.WriteLine("Background worker should have stopped at this moment...");
         ConstructWorker();
+    }
+
+    private void HighlightWorkerOnRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+    {
+        if (e.Cancelled)
+        {
+            StateHasChanged();
+        }
+    }
+
+    private void HighlightWorkerOnDoWork(object sender, DoWorkEventArgs e)
+    {
+        // I think this has some wierd concurrency problem because it keeps spawning new Threads.
+        while (!highlightWorker.CancellationPending)
+        {
+            Thread.Sleep(10 * 1000);
+            var result = Task.Run(() => { _mediator.Send(new HighlightsQuery()); });
+        }
+        Debug.WriteLine("Highlight background worker should have stopped at this moment...");
+        ConstructHighlightWorker();
     }
 }

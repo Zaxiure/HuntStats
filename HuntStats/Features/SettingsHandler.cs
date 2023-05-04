@@ -134,6 +134,9 @@ create table if not exists Teams
         var columnCheck = await con.QueryAsync<ColumnsClass>("pragma table_info(Settings)");
         var StartWorkerOnBoot = columnCheck.FirstOrDefault(x => x.name == "StartWorkerOnBoot");
         var PlayerProfileId = columnCheck.FirstOrDefault(x => x.name == "PlayerProfileId");
+        var HighlightsTempPath = columnCheck.FirstOrDefault(x => x.name == "HighlightsTempPath");
+        var HighlightsOutputPath = columnCheck.FirstOrDefault(x => x.name == "HighlightsOutputPath");
+
         if (StartWorkerOnBoot == null)
         {
             con.QueryAsync(@"alter table Settings
@@ -144,6 +147,20 @@ create table if not exists Teams
         {
             con.QueryAsync(@"alter table Settings
                 add PlayerProfileId nvarchar;
+            ");
+        }
+
+        if (HighlightsTempPath == null)
+        {
+            con.QueryAsync(@"alter table Settings
+                add HighlightsTempPath nvarchar(16);
+            ");
+        }
+
+        if (HighlightsOutputPath == null)
+        {
+            con.QueryAsync(@"alter table Settings
+                add HighlightsOutputPath nvarchar(16);
             ");
         }
 
@@ -184,7 +201,9 @@ public class UpdateSettingsCommandHandler : IRequestHandler<UpdateSettingsComman
             await con.InsertAsync(new Settings()
             {
                 Path = request.Settings.Path,
-                StartWorkerOnBoot = request.Settings.StartWorkerOnBoot
+                HighlightsTempPath = request.Settings.HighlightsTempPath,
+                HighlightsOutputPath = request.Settings.HighlightsOutputPath,
+                StartWorkerOnBoot = request.Settings.StartWorkerOnBoot,
             });
         }
         else
@@ -192,9 +211,13 @@ public class UpdateSettingsCommandHandler : IRequestHandler<UpdateSettingsComman
             settings.Path = request.Settings.Path;
             settings.PlayerProfileId = request.Settings.PlayerProfileId;
             settings.StartWorkerOnBoot = request.Settings.StartWorkerOnBoot;
+            settings.HighlightsTempPath = request.Settings.HighlightsTempPath;
+            settings.HighlightsOutputPath = request.Settings.HighlightsOutputPath;
             await con.UpdateAsync(settings);
         }
         _appState.PathChanged(request.Settings.Path);
+        _appState.HighlightsTempPathChanged(request.Settings.HighlightsTempPath);
+        _appState.HighlightsOutputPathChanged(request.Settings.HighlightsOutputPath);
         if (!fileExists) return GeneralStatus.Error;
 
         return GeneralStatus.Succes;
