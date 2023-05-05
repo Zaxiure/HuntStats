@@ -8,8 +8,6 @@ public class Settings
     public string HighlightsTempPath { get; set; }
     public string HighlightsOutputPath { get; set; }
 
-    public bool CopyHighlights { get; set; }
-
     public bool StartWorkerOnBoot { get; set; }
 
     public string PlayerProfileId { get; set; }
